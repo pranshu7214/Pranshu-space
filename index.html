@@ -1,107 +1,67 @@
 <!DOCTYPE html>
-<html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Pranshu</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pranshu’s Library</title>
 
-<style>
-body {
-  background: #fafafa;
-  color: #111;
-  font-family: Georgia, "Times New Roman", serif;
-  line-height: 1.7;
-}
-
-.container {
-  max-width: 700px;
-  margin: 80px auto;
-  padding: 0 20px;
-}
-
-h1 {
-  font-size: 2.8em;
-  font-weight: normal;
-}
-
-nav {
-  margin: 30px 0;
-}
-
-nav a {
-  text-decoration: none;
-  color: #111;
-  margin-right: 20px;
-  font-size: 1em;
-}
-
-nav a:hover {
-  text-decoration: underline;
-}
-
-p {
-  font-size: 1.05em;
-}
-</style>
-
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pranshu | Author</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<div class="container">
-
-<h1>Pranshu</h1>
-<p>Writer & Thinker</p>
-
-<nav>
-<a href="poems.html">Poems</a>
-<a href="essays.html">Essays</a>
-<a href="fiction.html">Fiction</a>
-<a href="about.html">About</a>
-</nav>
-
-<p>
-Welcome to my writing space.
-</p>
-
-</div>
-
+  <!-- Star background -->
   <div class="starfield" aria-hidden="true"></div>
-  <div class="planet planet-one" aria-hidden="true"></div>
-  <div class="planet planet-two" aria-hidden="true"></div>
 
-  <header class="site-header">
-    <nav aria-label="Primary navigation">
-      <ul class="nav-list">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="poems.html">Poems</a></li>
-        <li><a href="essays.html">Essays</a></li>
-        <li><a href="fiction.html">Fiction</a></li>
-        <li><a href="about.html">About</a></li>
-      </ul>
+  <!-- Ribbon Header -->
+  <header class="ribbon">
+    <nav class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="poems.html">Poems</a>
+      <a href="essays.html">Essays</a>
+      <a href="fiction.html">Fiction</a>
+    </nav>
+    <nav class="nav-right">
+      <a href="contact.html">Contact</a>
     </nav>
   </header>
 
-  <main>
-    <section class="hero" aria-labelledby="site-title">
-      <h1 id="site-title">Pranshu</h1>
-      <p class="tagline">Where silence turns into starlit stories.</p>
-    </section>
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <div class="planet saturn"></div>
 
-    <section class="intro" aria-label="Introduction">
-      <p>Welcome to my universe of words.</p>
-    </section>
-  </main>
+    <div class="hero-text">
+      <h1>Pranshu’s Library</h1>
+    </div>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section class="about">
+    <p>
+      I write to understand silence, action, and the strange intelligence of being alive.
+      This library holds poems, essays, and stories born from reflection, doubt, and wonder.
+    </p>
+  </section>
+
+  <!-- LIBRARY SECTION -->
+  <section class="library">
+    <div class="planet jupiter"></div>
+
+    <div class="cards">
+      <a href="poems.html" class="card">Poems</a>
+      <a href="essays.html" class="card">Essays</a>
+      <a href="fiction.html" class="card">Fiction</a>
+    </div>
+  </section>
 
   <footer>
-    <p>&copy; 2026 Pranshu. All rights reserved.</p>
+    <p>© 2026 Pranshu. All rights reserved.</p>
   </footer>
+
 </body>
 </html>
