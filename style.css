@@ -2,9 +2,12 @@
   --bg-deep: #040816;
   --bg-mid: #101a37;
   --bg-soft: #1e2f59;
-  --text-main: #eef1fb;
-  --text-muted: #cad1e8;
-  --line-soft: rgba(238, 241, 251, 0.3);
+
+  --text-main: #f1f3ff;
+  --text-muted: #c7cce6;
+
+  --accent: #ff9f1c;
+  --line-soft: rgba(241, 243, 255, 0.25);
 }
 
 * {
@@ -14,159 +17,167 @@
 body {
   margin: 0;
   min-height: 100vh;
+  font-family: "Spectral", Georgia, serif;
   color: var(--text-main);
-  font-family: "Spectral", Georgia, "Times New Roman", serif;
   background:
-    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.12) 0.09rem, transparent 0.12rem),
-    radial-gradient(circle at 81% 33%, rgba(255, 255, 255, 0.1) 0.08rem, transparent 0.11rem),
-    radial-gradient(circle at 37% 74%, rgba(255, 255, 255, 0.11) 0.07rem, transparent 0.11rem),
-    linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 52%, var(--bg-soft) 100%);
-  background-size: 28rem 28rem, 30rem 30rem, 24rem 24rem, cover;
-  display: flex;
-  flex-direction: column;
-  position: relative;
+    linear-gradient(160deg, var(--bg-deep), var(--bg-mid), var(--bg-soft));
   overflow-x: hidden;
 }
 
+/* Stars */
 .starfield {
   position: fixed;
   inset: 0;
   pointer-events: none;
   background-image:
-    radial-gradient(1.2px 1.2px at 10% 20%, rgba(255, 255, 255, 0.48), transparent),
-    radial-gradient(1.1px 1.1px at 28% 84%, rgba(255, 255, 255, 0.35), transparent),
-    radial-gradient(1.4px 1.4px at 46% 62%, rgba(255, 255, 255, 0.42), transparent),
-    radial-gradient(1px 1px at 64% 24%, rgba(255, 255, 255, 0.3), transparent),
-    radial-gradient(1.2px 1.2px at 79% 47%, rgba(255, 255, 255, 0.46), transparent),
-    radial-gradient(1px 1px at 88% 76%, rgba(255, 255, 255, 0.32), transparent);
+    radial-gradient(1.2px 1.2px at 20% 30%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,0.35), transparent),
+    radial-gradient(1.4px 1.4px at 40% 80%, rgba(255,255,255,0.45), transparent);
   opacity: 0.7;
   z-index: 0;
 }
 
-.planet {
+/* Ribbon Header */
+.ribbon {
   position: fixed;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.12));
+  top: 0;
+  width: 100%;
+  padding: 0.8rem 2rem;
+  background: var(--accent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
 }
 
-.planet-one {
-  width: clamp(120px, 14vw, 185px);
-  aspect-ratio: 1;
-  top: 16%;
-  right: 8%;
-  background: radial-gradient(circle at 30% 30%, #f1d7a0, #9f7ac9 45%, #5a3f83 100%);
-  opacity: 0.68;
+.ribbon a {
+  color: #111;
+  text-decoration: none;
+  margin-right: 1.4rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
 }
 
-.planet-two {
-  width: clamp(75px, 10vw, 132px);
-  aspect-ratio: 1;
-  bottom: 12%;
-  left: 8%;
-  background: radial-gradient(circle at 40% 40%, #afdbff, #4f81c6 52%, #2f4e7c 100%);
-  opacity: 0.6;
+.ribbon a:last-child {
+  margin-right: 0;
 }
 
-.site-header,
-main,
-footer {
+/* Sections */
+section {
   position: relative;
   z-index: 1;
 }
 
-.site-header {
-  padding-top: 2.7rem;
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 6rem 6vw;
 }
 
-.nav-list {
-  list-style: none;
-  display: flex;
-  justify-content: center;
-  gap: 2.4rem;
-  margin: 0;
-  padding: 0;
+.hero-text h1 {
+  font-size: clamp(3.5rem, 7vw, 6rem);
+  letter-spacing: 0.08em;
+  font-weight: 600;
 }
 
-.nav-list a {
+/* Saturn */
+.saturn {
+  width: clamp(220px, 30vw, 360px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #f2d6a2, #9c7bbd 50%, #4f356b 100%);
+  position: relative;
+  transform: rotate(-18deg);
+}
+
+.saturn::before {
+  content: "";
+  position: absolute;
+  inset: -25%;
+  border-radius: 50%;
+  border: 6px solid rgba(242, 214, 162, 0.45);
+  transform: rotate(25deg);
+}
+
+/* About */
+.about {
+  padding: 6rem 20vw;
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.about p {
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
   color: var(--text-muted);
-  text-decoration: none;
-  letter-spacing: 0.07em;
-  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-  font-weight: 500;
-  transition: color 0.25s ease;
-}
-
-.nav-list a:hover,
-.nav-list a:focus-visible {
-  color: var(--text-main);
-}
-
-main {
-  flex: 1;
-  width: min(90%, 56rem);
-  margin: 0 auto;
   text-align: center;
+}
+
+/* Library */
+.library {
+  min-height: 100vh;
   display: grid;
   align-content: center;
-  gap: 2.5rem;
-  padding: 3.4rem 0;
+  gap: 4rem;
+  padding: 6rem 6vw;
 }
 
-.hero h1 {
-  margin: 0;
-  font-size: clamp(3.4rem, 9vw, 6.2rem);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-}
-
-.tagline {
-  margin-top: 1rem;
-  margin-bottom: 0;
-  color: var(--text-muted);
-  font-size: clamp(1.3rem, 2.6vw, 1.8rem);
-  font-weight: 400;
-}
-
-.intro {
-  width: min(100%, 42rem);
+.jupiter {
+  width: clamp(180px, 26vw, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
   margin: 0 auto;
-  padding-top: 1.2rem;
-  border-top: 1px solid var(--line-soft);
+  background: radial-gradient(circle at 30% 30%, #ffd7a8, #d18b5a 55%, #7a3e21 100%);
 }
 
-.intro p {
-  margin: 0;
-  font-size: clamp(1.25rem, 2.1vw, 1.6rem);
-  color: var(--text-main);
+/* Cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 2.5rem;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-footer {
-  padding: 1.9rem 1rem 2.6rem;
+.card {
+  padding: 3rem 1rem;
+  border: 1px solid var(--line-soft);
   text-align: center;
+  text-decoration: none;
+  color: var(--text-main);
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+  transition: transform 0.3s ease, background 0.3s ease;
 }
 
-footer p {
-  margin: 0;
+.card:hover {
+  transform: translateY(-6px);
+  background: rgba(255,255,255,0.05);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2.5rem 1rem;
   color: var(--text-muted);
-  font-size: 1.02rem;
-  letter-spacing: 0.03em;
+  font-size: 0.95rem;
 }
 
-@media (max-width: 700px) {
-  .nav-list {
-    gap: 1.2rem;
-    flex-wrap: wrap;
+/* Mobile */
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: centre;
+    gap: 3rem;
   }
 
-  .planet-one {
-    right: -30px;
-    top: 11%;
+  .cards {
+    grid-template-columns: 1fr;
   }
 
-  .planet-two {
-    left: -22px;
-    bottom: 10%;
+  .about {
+    padding: 4rem 8vw;
   }
 }
