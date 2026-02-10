@@ -1,0 +1,172 @@
+:root {
+  --bg-deep: #040816;
+  --bg-mid: #101a37;
+  --bg-soft: #1e2f59;
+  --text-main: #eef1fb;
+  --text-muted: #cad1e8;
+  --line-soft: rgba(238, 241, 251, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text-main);
+  font-family: "Spectral", Georgia, "Times New Roman", serif;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.12) 0.09rem, transparent 0.12rem),
+    radial-gradient(circle at 81% 33%, rgba(255, 255, 255, 0.1) 0.08rem, transparent 0.11rem),
+    radial-gradient(circle at 37% 74%, rgba(255, 255, 255, 0.11) 0.07rem, transparent 0.11rem),
+    linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-mid) 52%, var(--bg-soft) 100%);
+  background-size: 28rem 28rem, 30rem 30rem, 24rem 24rem, cover;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.starfield {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1.2px 1.2px at 10% 20%, rgba(255, 255, 255, 0.48), transparent),
+    radial-gradient(1.1px 1.1px at 28% 84%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1.4px 1.4px at 46% 62%, rgba(255, 255, 255, 0.42), transparent),
+    radial-gradient(1px 1px at 64% 24%, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1.2px 1.2px at 79% 47%, rgba(255, 255, 255, 0.46), transparent),
+    radial-gradient(1px 1px at 88% 76%, rgba(255, 255, 255, 0.32), transparent);
+  opacity: 0.7;
+  z-index: 0;
+}
+
+.planet {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.12));
+}
+
+.planet-one {
+  width: clamp(120px, 14vw, 185px);
+  aspect-ratio: 1;
+  top: 16%;
+  right: 8%;
+  background: radial-gradient(circle at 30% 30%, #f1d7a0, #9f7ac9 45%, #5a3f83 100%);
+  opacity: 0.68;
+}
+
+.planet-two {
+  width: clamp(75px, 10vw, 132px);
+  aspect-ratio: 1;
+  bottom: 12%;
+  left: 8%;
+  background: radial-gradient(circle at 40% 40%, #afdbff, #4f81c6 52%, #2f4e7c 100%);
+  opacity: 0.6;
+}
+
+.site-header,
+main,
+footer {
+  position: relative;
+  z-index: 1;
+}
+
+.site-header {
+  padding-top: 2.7rem;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 2.4rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-list a {
+  color: var(--text-muted);
+  text-decoration: none;
+  letter-spacing: 0.07em;
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  font-weight: 500;
+  transition: color 0.25s ease;
+}
+
+.nav-list a:hover,
+.nav-list a:focus-visible {
+  color: var(--text-main);
+}
+
+main {
+  flex: 1;
+  width: min(90%, 56rem);
+  margin: 0 auto;
+  text-align: center;
+  display: grid;
+  align-content: center;
+  gap: 2.5rem;
+  padding: 3.4rem 0;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(3.4rem, 9vw, 6.2rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.tagline {
+  margin-top: 1rem;
+  margin-bottom: 0;
+  color: var(--text-muted);
+  font-size: clamp(1.3rem, 2.6vw, 1.8rem);
+  font-weight: 400;
+}
+
+.intro {
+  width: min(100%, 42rem);
+  margin: 0 auto;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line-soft);
+}
+
+.intro p {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.1vw, 1.6rem);
+  color: var(--text-main);
+}
+
+footer {
+  padding: 1.9rem 1rem 2.6rem;
+  text-align: center;
+}
+
+footer p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 1.02rem;
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 700px) {
+  .nav-list {
+    gap: 1.2rem;
+    flex-wrap: wrap;
+  }
+
+  .planet-one {
+    right: -30px;
+    top: 11%;
+  }
+
+  .planet-two {
+    left: -22px;
+    bottom: 10%;
+  }
+}
