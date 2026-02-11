@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pranshu’s Library</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,65 +14,102 @@
 
 <body>
 
-  <!-- STAR BACKGROUND IMAGE -->
+  <!-- EARTH BACKGROUND -->
   <div class="space-bg"></div>
 
   <!-- RIBBON -->
   <header class="ribbon">
-  <nav class="nav-left">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="poems.html">Poems</a>
-    <a href="essays.html">Essays</a>
-    <a href="fiction.html">Fiction</a>
-  </nav>
 
-  <nav class="nav-right">
-    <a href="contact.html">Contact</a>
-    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-    <a href="mailto:yourmail@example.com"><i class="fa-solid fa-envelope"></i></a>
-  </nav>
-</header>
+    <nav class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="poems.html">Poems</a>
+      <a href="essays.html">Essays</a>
+      <a href="fiction.html">Fiction</a>
+    </nav>
+
+    <!-- CENTER LOGO -->
+    <div class="nav-logo">
+  <a href="index.html">
+    <img src="images/final logo.png" alt="Logo">
+  </a>
+</div>
+
+    <nav class="nav-right">
+      <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="mailto:yourmail@example.com"><i class="fa-solid fa-envelope"></i></a>
+    </nav>
+
+  </header>
 
   <!-- HERO -->
   <section class="hero">
-     <img src="saturn.png" alt="Company Name Logo" width="150" height="50">
 
-    <div class="hero-text">
+    <div class="hero-left">
       <h1>PRANSHU'S LIBRARY</h1>
     </div>
+
+    <div class="hero-right">
+      <img src="images/final logo.png" class="hero-logo" alt="Logo">
+    </div>
+
   </section>
 
-  <!-- ABOUT -->
+  <!-- QUOTE SECTION -->
   <section class="about">
-    <p>
-      <em> “At some point in life, the world's beauty becomes enough. You don't need to photograph, paint, or even remember it. It is enough. 
-      If there's a book that you want to read, but it hasn't been written yet, then you must write it.”
-      <b>-Tom Morrison </b></em>
-    </p>
+    <div class="jupiter-bg"></div>
+    <p class="quote">
+  <span>
+    “At some point in life, the world's beauty becomes enough. You don't need to photograph, paint, or even remember it. It is enough. 
+    If there's a book that you want to read, but it hasn't been written yet, then you must write it.”
+  </span>
+
+  <span class="author">— Tom Morrison</span>
+</p>
   </section>
 
   <!-- LIBRARY -->
   <section class="library">
-    <img src="images/moon.jpg" alt="Jupiter" class="planet jupiter">
 
     <div class="cards">
-      <a href="poems.html" class="card">Poems</a>
-      <a href="essays.html" class="card">Essays</a>
-      <a href="fiction.html" class="card">Fiction</a>
+      <a href="poems.html" class="card poems">Poems</a>
+      <a href="essays.html" class="card essays">Essays</a>
+      <a href="fiction.html" class="card fiction">Fiction</a>
     </div>
+
   </section>
 
   <footer>
     <p>© 2026 Pranshu. All rights reserved.</p>
-      <nav class="nav-right">
-    <a href="contact.html">Contact</a>
-    <a href="#"><i class="fa-brands fa-instagram"></i></a>
-    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-    <a href="mailto:yourmail@example.com"><i class="fa-solid fa-envelope"></i></a>
-  </nav>
+
+    <div class="footer-icons">
+      <a href="#"><i class="fa-brands fa-instagram"></i></a>
+      <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+      <a href="mailto:yourmail@example.com"><i class="fa-solid fa-envelope"></i></a>
+    </div>
   </footer>
 
+  <script>
+  const jupiter = document.querySelector(".jupiter-bg");
+  const quoteSection = document.querySelector(".about");
+
+  window.addEventListener("scroll", () => {
+    const rect = quoteSection.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+
+    if(rect.top < windowHeight && rect.bottom > 0){
+      const progress = 1 - (rect.bottom / (windowHeight + rect.height));
+
+      const xMove = progress * 220;   // left → right
+      const yMove = progress * -120;  // upward arc
+      const rotate = progress * 25;
+
+      jupiter.style.transform = 
+        `translate(${xMove}%, ${yMove}%) rotate(${rotate}deg)`;
+    }
+  });
+</script>
+  
 </body>
 </html>
