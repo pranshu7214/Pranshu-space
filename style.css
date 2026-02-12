@@ -19,7 +19,9 @@ body {
 .space-bg{
   position:fixed;
   inset:0;
-  background:url("images/StockCake-Earth_from_Moon-829462-standard.jpg") center/cover no-repeat;
+  background:
+    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.75)),
+    url("images/StockCake-Earth_from_Moon-829462-standard.jpg") center/cover no-repeat;
   z-index:-2;
 }
 
@@ -42,7 +44,7 @@ body {
   color:white;
   text-decoration:none;
   margin-right:2rem;
-  font-size:1.2rem;
+  font-size:1.3rem;
   font-weight:600;
   letter-spacing:0.08em;
 }
@@ -54,7 +56,7 @@ body {
 }
 
 .nav-logo img{
-  height:60px;
+  height:72px;
 }
 
 /* HERO */
@@ -67,8 +69,11 @@ body {
 }
 
 .hero-left h1{
-  font-size:clamp(4rem,8vw,7rem);
+  font-size:clamp(4.2rem,8.5vw,7.5rem);
   letter-spacing:0.12em;
+  text-shadow:
+    0 0 20px rgba(255,255,255,0.35),
+    0 0 40px rgba(255,255,255,0.15);
 }
 
 .hero-right{
@@ -78,24 +83,18 @@ body {
 }
 
 .hero-logo{
-  width:320px;
-  filter:drop-shadow(0 0 40px rgba(255,255,255,0.5));
-  animation:spinFast 1.2s ease-out forwards;
+  width:380px;
+  filter:
+    drop-shadow(0 0 60px rgba(255,255,255,0.6))
+    drop-shadow(0 0 120px rgba(255,255,255,0.25));
+  animation:spinFast 1.9s ease-out forwards;
 }
 
 @keyframes spinFast{
-  0%{
-    transform:rotate(0deg) scale(0.5);
-  }
-  70%{
-    transform:rotate(1080deg) scale(1);
-  }
-  85%{
-    transform:rotate(1080deg) translateY(-20px);
-  }
-  100%{
-    transform:rotate(1080deg) translateY(0);
-  }
+  0%{ transform:rotate(0deg) scale(0.5); }
+  70%{ transform:rotate(2160deg) scale(1); }
+  85%{ transform:rotate(2160deg) translateY(-20px); }
+  100%{ transform:rotate(2160deg) translateY(0); }
 }
 
 /* QUOTE */
@@ -115,14 +114,17 @@ body {
 /* Main quote text */
 .quote span{
   display:block;
+  font-style:italic;
   color:#e6e6e6;   /* dark white */
   line-height:1.7;
+  text-shadow:0 0 15px rgba(255,255,255,0.25);
 }
 
 /* Author */
 .author{
   margin-top:1.8rem;
-  font-size:1.2rem;
+  font-size:1.5rem;
+  font-weight:700;
   opacity:0.7;
   letter-spacing:0.08em;
 }
@@ -147,43 +149,82 @@ body {
   align-items:center;
   justify-content:center;
   padding:6rem 6vw;
+  position:relative;
+}
+
+/* SATURN BACKGROUND */
+.saturn-bg{
+  position:absolute;
+  width:500px;
+  height:500px;
+  background:url("images/saturn.png") center/contain no-repeat;
+  opacity:0;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:0;
 }
 
 /* CARDS */
 .cards{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:3rem;
+  grid-template-columns:1fr;
+  gap:6rem;
 }
 
+/* Base Card */
 .card{
+  width:70%;
   background:rgba(255,255,255,0.95);
   color:#000;
-  padding:4rem 2rem;
-  border-radius:22px;
+  padding:6rem 4rem;
+  border-radius:26px;
   text-align:center;
-  font-size:1.6rem;
+  font-size:2rem;
   letter-spacing:0.12em;
   font-weight:700;
   text-decoration:none;
+  transition:all 0.5s ease;
+}
+
+/* Zig-zag */
+.poems{ margin-left:0; }
+.essays{ margin-left:auto; }
+.fiction{ margin-left:0; }
+
+/* Title & Preview animation */
+.title,
+.preview{
   transition:all 0.4s ease;
 }
 
+.preview{
+  display:none;
+  font-size:1rem;
+  font-style:italic;
+  margin-top:1.8rem;
+  line-height:1.6;
+  opacity:0.85;
+}
+
+/* Hover Effects */
 .card:hover{
-  transform:scale(1.1);
+  transform:scale(1.12);
+  font-weight:800;
 }
 
-.poems:hover{
-  border:3px solid yellow;
+.card:hover .preview{
+  display:block;
 }
 
-.essays:hover{
-  border:3px solid red;
+.card:hover .title{
+  opacity:0;
+  transform:translateY(-30px);
 }
 
-.fiction:hover{
-  border:3px solid orange;
-}
+/* Borders */
+.poems:hover{ border:3px solid #ffd700; }
+.essays:hover{ border:3px solid #ff3b3b; }
+.fiction:hover{ border:3px solid #ff8c00; }
 
 /* FOOTER */
 footer{
@@ -205,4 +246,45 @@ footer p{
   margin:0 1rem;
   color:white;
   font-size:1.5rem;
+}
+
+/* MOBILE MENU */
+.menu-toggle{
+  display:none;
+  color:white;
+  font-size:1.8rem;
+  cursor:pointer;
+}
+
+/* Mobile Layout */
+@media(max-width:900px){
+
+  .menu-toggle{
+    display:block;
+  }
+
+  .nav-left{
+    position:absolute;
+    top:110px;
+    left:0;
+    width:100%;
+    background:rgba(6,90,60,0.95);
+    display:none;
+    flex-direction:column;
+    padding:2rem;
+  }
+
+  .nav-left a{
+    margin:1rem 0;
+    font-size:1.4rem;
+  }
+
+  .nav-right{
+    display:none;
+  }
+
+  .nav-left.active{
+    display:flex;
+  }
+
 }
