@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pranshu’s Library</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="images/final logo.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,6 +13,15 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 
+<script>
+const toggle = document.querySelector(".menu-toggle");
+const menu = document.getElementById("mobileMenu");
+
+toggle.addEventListener("click", () => {
+  menu.classList.toggle("active");
+});
+</script>
+  
 <body>
 
   <!-- EARTH BACKGROUND -->
@@ -20,7 +30,11 @@
   <!-- RIBBON -->
   <header class="ribbon">
 
-    <nav class="nav-left">
+<div class="menu-toggle">
+  <i class="fa-solid fa-bars"></i>
+</div>
+    
+    <nav class="nav-left" id="mobileMenu">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
       <a href="poems.html">Poems</a>
@@ -38,7 +52,7 @@
     <nav class="nav-right">
       <a href="#"><i class="fa-brands fa-instagram"></i></a>
       <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-      <a href="mailto:yourmail@example.com"><i class="fa-solid fa-envelope"></i></a>
+      <a href="mailto:pranshu.writes@gmail.com"><i class="fa-solid fa-envelope"></i></a>
     </nav>
 
   </header>
@@ -72,10 +86,37 @@
   <!-- LIBRARY -->
   <section class="library">
 
+<div class="saturn-bg"></div>
+    
     <div class="cards">
-      <a href="poems.html" class="card poems">Poems</a>
-      <a href="essays.html" class="card essays">Essays</a>
-      <a href="fiction.html" class="card fiction">Fiction</a>
+      <a href="poems.html" class="card poems">
+  <span class="title">Poems</span>
+  <span class="preview">
+    "The shard, the glass so very sharp,<br>
+    cut through her soul,<br> 
+    yet she lived.<br>
+    Why then the scalpel,<br>
+    when it cut her veins,<br>
+    did not spare?"
+  </span>
+</a>
+      <a href="essays.html" class="card essays">
+  <span class="title">Essays</span>
+  <span class="preview">
+    "To truly change the world, we must first change the way we view education.
+    The real test of an education system is not in the marksheets it prints,
+    but in the kind of human beings it produces.
+    What kind are we producing?"
+  </span>
+</a>
+      <a href="fiction.html" class="card fiction">
+  <span class="title">Fiction</span>
+  <span class="preview">
+    "You signed off on the body count.
+    Math won’t wash off blood.
+    Don't hide behind patriotism now."
+  </span>
+</a>
     </div>
 
   </section>
@@ -91,24 +132,33 @@
   </footer>
 
   <script>
-  const jupiter = document.querySelector(".jupiter-bg");
-  const quoteSection = document.querySelector(".about");
+const jupiter = document.querySelector(".jupiter-bg");
+const saturn = document.querySelector(".saturn-bg");
+const quote = document.querySelector(".about");
+const library = document.querySelector(".library");
 
-  window.addEventListener("scroll", () => {
-    const rect = quoteSection.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
+window.addEventListener("scroll", () => {
 
-    if(rect.top < windowHeight && rect.bottom > 0){
-      const progress = 1 - (rect.bottom / (windowHeight + rect.height));
+  const q = quote.getBoundingClientRect();
+  const l = library.getBoundingClientRect();
+  const vh = window.innerHeight;
 
-      const xMove = progress * 220;   // left → right
-      const yMove = progress * -120;  // upward arc
-      const rotate = progress * 25;
+  if(q.top < vh && q.bottom > 0){
+    const p = 1 - (q.bottom / (vh + q.height));
 
-      jupiter.style.transform = 
-        `translate(${xMove}%, ${yMove}%) rotate(${rotate}deg)`;
-    }
-  });
+    jupiter.style.transform =
+      `translate(${p*240}%, ${p*120}%)`;
+
+    jupiter.style.opacity = Math.min(0.75, p);
+  }
+
+  if(l.top < vh){
+    const p2 = 1 - (l.top / vh);
+    saturn.style.transform = `translateY(${(1-p2)*200}px)`;
+    saturn.style.opacity = Math.min(0.5, p2);
+  }
+
+});
 </script>
   
 </body>
