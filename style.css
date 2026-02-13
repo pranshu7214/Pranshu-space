@@ -1,290 +1,287 @@
 :root {
-  --text-main: #f3f4ff;
-  --text-muted: #c9cde8;
-  --accent: #063a2d;
-  --line-soft: rgba(243,244,255,0.25);
+  --font-main: "Spectral", serif;
+  --text-color: #e0e0e0;
+  --ribbon-bg: rgba(5, 10, 15, 0.85); 
+  
+  /* Theme Borders - Vibrant Palette */
+  --color-poems: #FFD700;   /* Vibrant Yellow/Gold */
+  --color-essays: #FF3B3B;  /* Deep Red */
+  --color-fiction: #FF8C00; /* Dark Orange */
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  margin: 0;
-  font-family: "Spectral", Georgia, serif;
-  color: var(--text-main);
-  background: black;
+  font-family: var(--font-main);
+  background: #000;
+  color: var(--text-color);
   overflow-x: hidden;
 }
 
-/* EARTH BACKGROUND */
-.space-bg{
-  position:fixed;
-  inset:0;
-  background:
-    linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.75)),
-    url("images/StockCake-Earth_from_Moon-829462-standard.jpg") center/cover no-repeat;
-  z-index:-2;
+/* --- BACKGROUNDS --- */
+.space-bg {
+  position: fixed;
+  inset: 0;
+  /* Updated to universe.jpg with a vignette to make text readable */
+  background: 
+    radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
+    url("images/universe.jpg") center/cover no-repeat;
+  z-index: -5;
 }
 
-/* RIBBON */
-.ribbon{
-  position:fixed;
-  top:0;
-  width:100%;
-  height:110px;
-  padding:0 3rem;
-  background:rgba(6,58,45,0.85);
-  backdrop-filter:blur(8px);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  z-index:10;
+.planet {
+  position: fixed;
+  background-repeat: no-repeat;
+  background-size: contain;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.3s ease; /* Smooth fade in/out */
 }
 
-.ribbon a{
-  color:white;
-  text-decoration:none;
-  margin-right:2rem;
-  font-size:1.3rem;
-  font-weight:600;
-  letter-spacing:0.08em;
+/* Jupiter: Starts hidden left */
+.jupiter {
+  width: 500px; /* Big & majestic */
+  height: 500px;
+  background-image: url("images/jupiter.png");
+  opacity: 0.1; /* Starts faint */
 }
 
-.nav-logo{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
+/* Saturn: Starts hidden */
+.saturn {
+  width: 400px;
+  height: 400px;
+  background-image: url("images/saturn.png");
+  opacity: 0;
 }
 
-.nav-logo img{
-  height:72px;
+/* --- RIBBON --- */
+.ribbon {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 90px;
+  background: var(--ribbon-bg);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4rem;
+  z-index: 100;
 }
 
-/* HERO */
-.hero{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:10rem 8vw;
+.nav-left a, .nav-right a {
+  text-decoration: none;
+  color: #fff;
+  font-size: 1.2rem;
+  margin: 0 1.5rem;
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
 }
 
-.hero-left h1{
-  font-size:clamp(4.2rem,8.5vw,7.5rem);
-  letter-spacing:0.12em;
-  text-shadow:
-    0 0 20px rgba(255,255,255,0.35),
-    0 0 40px rgba(255,255,255,0.15);
+.nav-left a:hover, .nav-right a:hover { color: var(--color-poems); }
+
+/* Center Logo Overlap */
+.nav-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 10px; /* Pushes it slightly down */
+  z-index: 101;
 }
 
-.hero-right{
-  display:flex;
-  justify-content:center;
-  align-items:center;
+.nav-logo img {
+  height: 110px; /* Bigger than ribbon (90px) for overlap */
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+  transition: transform 0.3s;
 }
 
-.hero-logo{
-  width:380px;
-  filter:
-    drop-shadow(0 0 60px rgba(255,255,255,0.6))
-    drop-shadow(0 0 120px rgba(255,255,255,0.25));
-  animation:spinFast 1.9s ease-out forwards;
+.nav-logo img:hover { transform: scale(1.05); }
+
+/* --- HERO --- */
+.hero {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
 }
 
-@keyframes spinFast{
-  0%{ transform:rotate(0deg) scale(0.5); }
-  70%{ transform:rotate(2160deg) scale(1); }
-  85%{ transform:rotate(2160deg) translateY(-20px); }
-  100%{ transform:rotate(2160deg) translateY(0); }
+.hero h1 {
+  font-size: clamp(3rem, 6vw, 6rem); /* Responsive sizing */
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 30px rgba(255,255,255,0.2);
 }
 
-/* QUOTE */
-.about{
-  position:relative;
-  padding:8rem 20vw;
-  text-align:center;
-  overflow:hidden;
+.spinning-logo {
+  width: 280px;
+  opacity: 0.9;
+  /* Slower spin: 20s */
+  animation: spinSlow 20s infinite linear;
 }
 
-.about p{
-  font-size:clamp(1.3rem,2.4vw,1.7rem);
-  position:relative;
-  z-index:2;
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* Main quote text */
-.quote span{
-  display:block;
-  font-style:italic;
-  color:#e6e6e6;   /* dark white */
-  line-height:1.7;
-  text-shadow:0 0 15px rgba(255,255,255,0.25);
+/* --- QUOTE --- */
+.about {
+  min-height: 80vh; /* Gives it breathing room */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15vw;
+  text-align: center;
+  position: relative;
 }
 
-/* Author */
-.author{
-  margin-top:1.8rem;
-  font-size:1.5rem;
-  font-weight:700;
-  opacity:0.7;
-  letter-spacing:0.08em;
+.quote-text {
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-style: italic;
+  line-height: 1.8;
+  color: #dcdcdc;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.8);
 }
 
-/* Jupiter scroll effect */
-.jupiter-bg{
-  position:absolute;
-  top:50%;
-  left:-50%;
-  width:600px;
-  height:600px;
-  background:url("images/jupiter.png") center/contain no-repeat;
-  transform:translateY(-50%);
-  opacity:0.2;
-  transition:transform 1.5s ease;
+.highlight {
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 }
 
-/* LIBRARY */
-.library{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:6rem 6vw;
-  position:relative;
+/* --- LIBRARY CARDS --- */
+.library {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  perspective: 1000px; /* For 3D feel */
 }
 
-/* SATURN BACKGROUND */
-.saturn-bg{
-  position:absolute;
-  width:500px;
-  height:500px;
-  background:url("images/saturn.png") center/contain no-repeat;
-  opacity:0;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:0;
+.cards-container {
+  display: flex;
+  gap: 3rem; /* Space between cards */
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 1400px;
 }
 
-/* CARDS */
-.cards{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:6rem;
+.card {
+  position: relative;
+  width: 320px;
+  height: 450px;
+  background: rgba(0, 0, 0, 0.6); /* Dark glass */
+  border: 1px solid rgba(255,255,255,0.1);
+  text-decoration: none;
+  color: white;
+  overflow: hidden; /* Important for shutter */
+  transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Smooth expansion */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* Base Card */
-.card{
-  width:70%;
-  background:rgba(255,255,255,0.95);
-  color:#000;
-  padding:6rem 4rem;
-  border-radius:26px;
-  text-align:center;
-  font-size:2rem;
-  letter-spacing:0.12em;
-  font-weight:700;
-  text-decoration:none;
-  transition:all 0.5s ease;
+/* The Border Colors */
+.earth-theme { border-bottom: 4px solid var(--color-poems); }
+.fire-theme  { border-bottom: 4px solid var(--color-essays); }
+.water-theme { border-bottom: 4px solid var(--color-fiction); }
+
+.card-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Zig-zag */
-.poems{ margin-left:0; }
-.essays{ margin-left:auto; }
-.fiction{ margin-left:0; }
-
-/* Title & Preview animation */
-.title,
-.preview{
-  transition:all 0.4s ease;
+.card-title {
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  transition: transform 0.5s ease, opacity 0.5s;
 }
 
-.preview{
-  display:none;
-  font-size:1rem;
-  font-style:italic;
-  margin-top:1.8rem;
-  line-height:1.6;
-  opacity:0.85;
+/* The Diagonal Shutter Text */
+.shutter-reveal {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8); /* Darker bg for text readability */
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  /* Start hidden diagonally */
+  clip-path: polygon(0 100%, 100% 100%, 0% 100%);
+  transition: clip-path 0.7s ease-in-out;
 }
 
-/* Hover Effects */
-.card:hover{
-  transform:scale(1.12);
-  font-weight:800;
+.shutter-reveal p {
+  font-size: 1.1rem;
+  font-style: italic;
+  line-height: 1.6;
 }
 
-.card:hover .preview{
-  display:block;
+/* --- HOVER EFFECTS --- */
+.card:hover {
+  transform: scale(1.08) translateY(-10px); /* Calmer growth as requested */
+  background: rgba(10, 10, 10, 0.9);
+  border-width: 4px; /* Making boundaries bold on hover */
 }
 
-.card:hover .title{
-  opacity:0;
-  transform:translateY(-30px);
+/* On hover, open the shutter diagonally */
+.card:hover .shutter-reveal {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
 }
 
-/* Borders */
-.poems:hover{ border:3px solid #ffd700; }
-.essays:hover{ border:3px solid #ff3b3b; }
-.fiction:hover{ border:3px solid #ff8c00; }
-
-/* FOOTER */
-footer{
-  background:#020b08;
-  padding:5rem 2rem;
-  text-align:center;
+.card:hover .card-title {
+  transform: translateY(-80px) scale(0.8); 
+  opacity: 0.5;
 }
 
-footer p{
-  color:#aab9b2;
-  letter-spacing:0.08em;
+/* Color specific hovers with bold borders and matching glows */
+.earth-theme:hover { 
+  border-color: var(--color-poems); 
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.2); 
 }
 
-.footer-icons{
-  margin-top:2rem;
+.fire-theme:hover { 
+  border-color: var(--color-essays); 
+  box-shadow: 0 0 40px rgba(255, 59, 59, 0.2); 
 }
 
-.footer-icons a{
-  margin:0 1rem;
-  color:white;
-  font-size:1.5rem;
+.water-theme:hover { 
+  border-color: var(--color-fiction); 
+  box-shadow: 0 0 40px rgba(255, 140, 0, 0.2); 
 }
 
-/* MOBILE MENU */
-.menu-toggle{
-  display:none;
-  color:white;
-  font-size:1.8rem;
-  cursor:pointer;
+/* --- FOOTER --- */
+footer {
+  text-align: center;
+  padding: 4rem;
+  color: #666;
+  font-size: 0.9rem;
 }
 
-/* Mobile Layout */
-@media(max-width:900px){
-
-  .menu-toggle{
-    display:block;
-  }
-
-  .nav-left{
-    position:absolute;
-    top:110px;
-    left:0;
-    width:100%;
-    background:rgba(6,90,60,0.95);
-    display:none;
-    flex-direction:column;
-    padding:2rem;
-  }
-
-  .nav-left a{
-    margin:1rem 0;
-    font-size:1.4rem;
-  }
-
-  .nav-right{
-    display:none;
-  }
-
-  .nav-left.active{
-    display:flex;
-  }
-
+/* Mobile Menu */
+.menu-toggle { display: none; font-size: 1.5rem; color: white; }
+@media(max-width: 900px) {
+  .menu-toggle { display: block; }
+  .nav-left, .nav-right { display: none; }
+  .ribbon { padding: 0 2rem; }
+  .cards-container { flex-direction: column; align-items: center; }
+  .card { width: 90%; height: 350px; }
+  .jupiter, .saturn { opacity: 0.1 !important; } /* Simplify mobile bg */
 }
