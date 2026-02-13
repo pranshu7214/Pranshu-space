@@ -4,162 +4,116 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pranshu’s Library</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="images/final logo.png">
-
+  <link rel="icon" type="image/png" href="favicon.png">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Spectral:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<script>
-const toggle = document.querySelector(".menu-toggle");
-const menu = document.getElementById("mobileMenu");
-
-toggle.addEventListener("click", () => {
-  menu.classList.toggle("active");
-});
-</script>
-  
 <body>
 
-  <!-- EARTH BACKGROUND -->
   <div class="space-bg"></div>
-
-  <!-- RIBBON -->
-  <header class="ribbon">
-
-<div class="menu-toggle">
-  <i class="fa-solid fa-bars"></i>
-</div>
+  <div class="planet jupiter"></div> <div class="planet saturn"></div>  <header class="ribbon">
+    <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
     
     <nav class="nav-left" id="mobileMenu">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
       <a href="poems.html">Poems</a>
       <a href="essays.html">Essays</a>
       <a href="fiction.html">Fiction</a>
     </nav>
 
-    <!-- CENTER LOGO -->
     <div class="nav-logo">
-  <a href="index.html">
-    <img src="images/final logo.png" alt="Logo">
-  </a>
-</div>
+      <a href="index.html">
+        <img src="images/final logo.png" alt="Logo">
+      </a>
+    </div>
 
     <nav class="nav-right">
+      <a href="about.html">About</a>
       <a href="#"><i class="fa-brands fa-instagram"></i></a>
       <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
       <a href="mailto:pranshu.writes@gmail.com"><i class="fa-solid fa-envelope"></i></a>
     </nav>
-
   </header>
 
-  <!-- HERO -->
-  <section class="hero">
+  <main>
 
-    <div class="hero-left">
-      <h1>PRANSHU'S LIBRARY</h1>
-    </div>
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Pranshu’s Library</h1>
+        <div class="hero-logo-container">
+          <img src="images/final logo.png" class="spinning-logo" alt="Logo">
+        </div>
+      </div>
+    </section>
 
-    <div class="hero-right">
-      <img src="images/final logo.png" class="hero-logo" alt="Logo">
-    </div>
+    <section class="about" id="quote-section">
+  <p class="quote-text">
+    “The most dangerous thing you can do is listen to your own soul in a world that demands your silence.<br><br>
+    <span class="highlight">These are the echoes of a voice that refused to be quiet.</span>”
+  </p>
+</section>
 
-  </section>
-
-  <!-- QUOTE SECTION -->
-  <section class="about">
-    <div class="jupiter-bg"></div>
-    <p class="quote">
-  <span>
-    “At some point in life, the world's beauty becomes enough. You don't need to photograph, paint, or even remember it. It is enough. 
-    If there's a book that you want to read, but it hasn't been written yet, then you must write it.”
-  </span>
-
-  <span class="author">— Tom Morrison</span>
-</p>
-  </section>
-
-  <!-- LIBRARY -->
-  <section class="library">
-
-<div class="saturn-bg"></div>
+    <section class="library" id="library-section">
+  <div class="cards-container">
     
-    <div class="cards">
-      <a href="poems.html" class="card poems">
-  <span class="title">Poems</span>
-  <span class="preview">
-    "The shard, the glass so very sharp,<br>
-    cut through her soul,<br> 
-    yet she lived.<br>
-    Why then the scalpel,<br>
-    when it cut her veins,<br>
-    did not spare?"
-  </span>
-</a>
-      <a href="essays.html" class="card essays">
-  <span class="title">Essays</span>
-  <span class="preview">
-    "To truly change the world, we must first change the way we view education.
-    The real test of an education system is not in the marksheets it prints,
-    but in the kind of human beings it produces.
-    What kind are we producing?"
-  </span>
-</a>
-      <a href="fiction.html" class="card fiction">
-  <span class="title">Fiction</span>
-  <span class="preview">
-    "You signed off on the body count.
-    Math won’t wash off blood.
-    Don't hide behind patriotism now."
-  </span>
-</a>
-    </div>
+    <a href="poems.html" class="card earth-theme">
+      <div class="card-content">
+        <span class="card-title">Poems</span>
+        <div class="shutter-reveal">
+          <p>
+            "The shard, the glass so very sharp,<br>
+            cut through her soul, yet she lived.<br>
+            Why then the scalpel, when it cut her veins,<br>
+            did not spare?"
+          </p>
+        </div>
+      </div>
+    </a>
 
-  </section>
+    <a href="essays.html" class="card fire-theme">
+      <div class="card-content">
+        <span class="card-title">Essays</span>
+        <div class="shutter-reveal">
+          <p>
+            "To truly change the world, we must first change the way we view education.<br>
+            The real test of an education system is not in the marksheets it prints,<br>
+            but in the kind of human beings it produces."
+          </p>
+        </div>
+      </div>
+    </a>
 
-  <footer>
-    <p>© 2026 Pranshu. All rights reserved.</p>
+    <a href="fiction.html" class="card water-theme">
+      <div class="card-content">
+        <span class="card-title">Fiction</span>
+        <div class="shutter-reveal">
+          <p>
+            "You signed off on the body count.<br>
+            Math won’t wash off blood.<br>
+            Don't hide behind patriotism now."
+          </p>
+        </div>
+      </div>
+    </a>
 
-    <div class="footer-icons">
-      <a href="#"><i class="fa-brands fa-instagram"></i></a>
-      <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
-      <a href="mailto:yourmail@example.com"><i class="fa-solid fa-envelope"></i></a>
-    </div>
-  </footer>
+  </div>
+</section>
 
-  <script>
-const jupiter = document.querySelector(".jupiter-bg");
-const saturn = document.querySelector(".saturn-bg");
-const quote = document.querySelector(".about");
-const library = document.querySelector(".library");
+    <footer>
+      <p>© 2026 Pranshu. All rights reserved.</p>
+      <div class="footer-icons">
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="mailto:pranshu.writes@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+      </div>
+    </footer>
 
-window.addEventListener("scroll", () => {
+  </main>
 
-  const q = quote.getBoundingClientRect();
-  const l = library.getBoundingClientRect();
-  const vh = window.innerHeight;
-
-  if(q.top < vh && q.bottom > 0){
-    const p = 1 - (q.bottom / (vh + q.height));
-
-    jupiter.style.transform =
-      `translate(${p*240}%, ${p*120}%)`;
-
-    jupiter.style.opacity = Math.min(0.75, p);
-  }
-
-  if(l.top < vh){
-    const p2 = 1 - (l.top / vh);
-    saturn.style.transform = `translateY(${(1-p2)*200}px)`;
-    saturn.style.opacity = Math.min(0.5, p2);
-  }
-
-});
-</script>
-  
+  <script src="script.js"></script>
 </body>
 </html>
