@@ -36,36 +36,59 @@ body {
   transition: opacity 0.4s ease;
 }
 
-.jupiter { width: 500px; height: 500px; background-image: url("images/jupiter.png"); opacity: 0; }
-.saturn { width: 400px; height: 400px; background-image: url("images/saturn.png"); opacity: 0; }
+/* Updated Initial Planet State */
+.jupiter { 
+  width: 500px; height: 500px; 
+  background-image: url("images/jupiter.png"); 
+  left: -250px; /* Half off-screen */
+  opacity: 0.5; /* Half opaque on load */
+  top: 20%; 
+}
 
-/* --- RIBBON --- */
+.saturn { 
+  width: 400px; height: 400px; 
+  background-image: url("images/saturn.png"); 
+  opacity: 0; 
+}
+
+/* --- RIBBON FIX (Flexbox Version) --- */
 .ribbon {
   position: fixed;
-  top: 0; width: 100%; height: 110px;
+  top: 0; width: 100%; height: 100px;
   background: var(--ribbon-bg);
   backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(255,255,255,0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4rem;
+  padding: 0 5%;
   z-index: 1000;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-  transition: all 0.5s ease;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+}
+
+.nav-left { order: 1; flex: 1; display: flex; justify-content: flex-end; gap: 2rem; }
+.nav-right { order: 3; flex: 1; display: flex; justify-content: flex-start; gap: 2rem; }
+
+.nav-logo { 
+  order: 2; 
+  position: static; 
+  transform: none; 
+}
+
+.nav-logo img { 
+  height: 80px; 
+  margin: 0 2rem; 
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.6)); 
 }
 
 .nav-left a, .nav-right a {
   text-decoration: none; color: #fff;
   font-size: 1.1rem; letter-spacing: 0.2em;
-  text-transform: uppercase; margin: 0 1.5rem;
+  text-transform: uppercase;
   transition: color 0.3s;
 }
 
 .nav-left a:hover, .nav-right a:hover { color: var(--color-poems); }
-
-.nav-logo { position: absolute; left: 50%; transform: translateX(-50%); top: 5px; }
-.nav-logo img { height: 130px; filter: drop-shadow(0 8px 20px rgba(0,0,0,0.6)); }
 
 /* --- HERO --- */
 .hero {
@@ -76,10 +99,11 @@ body {
 }
 
 .hero h1 {
-  font-size: clamp(3.5rem, 7vw, 6.5rem);
+  font-size: clamp(2.5rem, 5vw, 4.5rem); /* Smaller and more elegant */
   color: #fff;
   text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2);
   letter-spacing: 0.2em; text-transform: uppercase;
+  margin-bottom: 3rem; /* Extra space before the logo */
 }
 
 .spinning-logo { width: 280px; opacity: 0.9; animation: spinSlow 20s infinite linear; }
@@ -95,16 +119,19 @@ body {
 .quote-text { font-size: clamp(1.4rem, 2.5vw, 2rem); font-style: italic; line-height: 1.8; color: #dcdcdc; }
 .highlight { color: #fff; font-weight: 600; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
 
-/* --- LIBRARY CARDS --- */
+/* --- LIGHTER, SMALLER LIBRARY CARDS --- */
 .library { min-height: 80vh; padding: 4rem 2rem; display: flex; justify-content: center; }
 .cards-container { display: flex; flex-direction: column; align-items: center; gap: 3.5rem; width: 100%; }
 
 .card {
-  position: relative; width: 850px; height: 250px;
-  background: rgba(10, 10, 15, 0.7);
+  position: relative; 
+  width: 700px; /* Reduced width */
+  height: 200px; /* Reduced height */
+  background: rgba(255, 255, 255, 0.12); /* Lighter glass background */
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 40px; overflow: hidden;
+  border-radius: 30px; 
+  overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   text-decoration: none; color: white;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
@@ -116,24 +143,30 @@ body {
 .water-theme { border-left: 5px solid var(--color-water); }
 
 .card:hover {
-  width: 900px;
+  width: 750px;
   border-left-width: 12px;
-  background: rgba(20, 20, 25, 0.8);
+  background: rgba(255, 255, 255, 0.18);
 }
 
-.card-title { font-size: 2.5rem; font-weight: 300; letter-spacing: 0.1em; transition: 0.5s; }
+.card-title { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.1em; transition: 0.5s; }
 
 .shutter-reveal {
   position: absolute; inset: 0;
   background: rgba(5, 5, 10, 0.95);
-  padding: 3rem; display: flex; align-items: center; justify-content: center;
-  text-align: center; border-radius: 40px;
+  padding: 2rem; display: flex; align-items: center; justify-content: center;
+  text-align: center; border-radius: 30px;
   clip-path: polygon(0 100%, 100% 100%, 0% 100%);
   transition: clip-path 0.7s ease-in-out;
 }
 
+.shutter-reveal p {
+  font-size: 0.95rem; /* Smaller font for quotes */
+  line-height: 1.6;
+  color: #f0f0f0;
+}
+
 .card:hover .shutter-reveal { clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); }
-.card:hover .card-title { transform: translateY(-80px) scale(0.8); opacity: 0.3; }
+.card:hover .card-title { transform: translateY(-70px) scale(0.8); opacity: 0.3; }
 
 /* Elemental Glows */
 .earth-theme:hover { box-shadow: -15px 0 40px -10px var(--color-poems); }
@@ -156,11 +189,13 @@ footer { text-align: center; padding: 6rem 2rem; background: rgba(0,0,0,0.8); bo
     background: rgba(0, 0, 0, 0.98);
   }
   
-  .ribbon.menu-open .nav-left, .ribbon.menu-open .nav-right {
-    display: flex; flex-direction: column; align-items: center; gap: 2rem;
+  /* Increased gap for Mobile Menu items */
+  .ribbon.menu-open .nav-left, 
+  .ribbon.menu-open .nav-right {
+    display: flex; flex-direction: column; align-items: center; gap: 3.5rem;
   }
 
-  .card { width: 95vw; height: auto; min-height: 220px; border-radius: 25px; }
-  .jupiter { width: 250px; height: 250px; }
-  .saturn { width: 200px; height: 200px; }
+  .card { width: 95vw; height: auto; min-height: 200px; border-radius: 25px; }
+  .jupiter { width: 200px; height: 200px; left: -100px; }
+  .saturn { width: 180px; height: 180px; }
 }
