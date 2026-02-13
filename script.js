@@ -1,34 +1,43 @@
 window.addEventListener("scroll", () => {
     const scrollPx = window.scrollY;
-    const winH = window.innerHeight;
-    const docH = document.documentElement.scrollHeight;
-    const progress = scrollPx / (docH - winH);
+    
+    // Target the Library Section to find the "stop" point
+    const librarySection = document.querySelector('.library');
+    if(!librarySection) return; // Guard clause
 
+    const libraryTop = librarySection.offsetTop;
+    // We want them to stop at the vertical center of the library area
+    const libraryCenter = libraryTop + (librarySection.offsetHeight / 2);
+    
     const jupiter = document.querySelector(".jupiter");
     const saturn = document.querySelector(".saturn");
 
-    // --- JUPITER ARC ---
-    // Start Left -> Settle Right (80%)
-    let jupX = -10 + (progress * 110); 
-    if (jupX > 80) jupX = 80; 
+    // Calculate progress relative to the library section "stop point"
+    let progress = scrollPx / libraryCenter;
+    if (progress > 1) progress = 1; // This "Clamps" the movement
 
-    let jupY = 15 + (progress * 50); 
-    let jupOp = progress < 0.1 ? progress * 5 : 0.8;
+    // --- JUPITER LOGIC ---
+    // Start: Half-off screen (-250px) -> End: Right side of cards
+    // Using innerWidth * 0.7 to park it on the right side of the landscape cards
+    let jupX = -250 + (progress * (window.innerWidth * 0.7 + 250));
+    let jupY = 20 + (progress * 45); 
+    let jupOp = 0.5 + (progress * 0.3); // Fades from 0.5 to 0.8
 
-    jupiter.style.left = `${jupX}%`;
+    // Apply Jupiter styles
+    jupiter.style.transform = `translateX(${jupX}px)`;
     jupiter.style.top = `${jupY}%`;
     jupiter.style.opacity = jupOp;
 
-    // --- SATURN ARC ---
-    // Appears after Quote -> Settle Left (10%)
+    // --- SATURN LOGIC ---
+    // Starts appearing after 40% of the way to the library
     if (progress > 0.4) {
-        let satProg = (progress - 0.4) / 0.6; 
-        let satX = -20 + (satProg * 40); 
-        if (satX > 10) satX = 10; 
-
-        saturn.style.left = `${satX}%`;
-        saturn.style.top = `70%`;
-        saturn.style.opacity = Math.min(satProg * 2, 0.7);
+        let satProg = (progress - 0.4) / 0.6;
+        // Glides in from off-screen left to park next to cards
+        let satX = -300 + (satProg * 400); 
+        
+        saturn.style.transform = `translateX(${satX}px)`;
+        saturn.style.top = `65%`;
+        saturn.style.opacity = satProg * 0.7;
     } else {
         saturn.style.opacity = 0;
     }
@@ -39,7 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.querySelector(".menu-toggle");
     const ribbon = document.querySelector(".ribbon");
 
-    toggle.addEventListener("click", () => {
-        ribbon.classList.toggle("menu-open");
-    });
+    if(toggle) {
+        toggle.addEventListener("click", () => {
+            ribbon.classList.toggle("menu-open");
+        });
+    }
 });
