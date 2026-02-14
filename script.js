@@ -100,7 +100,7 @@ function updateCinematicPhysics() {
 
     jupiterEl.style.opacity = 0.6; // Constant visibility
     jupiterEl.style.filter = `blur(3px)`; // Subtle background blur
-    jupiterEl.style.transform = `translate3d(${jupiterX}px, ${jupiterY}px, 0) rotate(${jupiterProgress * 45}deg)`;
+    jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(1)}px, ${jupiterY.toFixed(1)}px, 0) rotate(${jupiterProgress * 45}deg)`;
 
     // ========== SATURN: CURVED PATH (RIGHT -> DIP -> LEFT & UP) ==========
     // Starts at Quote, dips behind cards, moves Left & Upwards
@@ -129,9 +129,9 @@ function updateCinematicPhysics() {
     // Extra: Scale effect to simulate 3D depth (larger when lower/closer)
     const saturnScale = 0.9 + 0.3 * Math.sin(saturnProgress * Math.PI);
 
-    saturnEl.style.opacity = (saturnFade * 0.6).toFixed(2);
+    saturnEl.style.opacity = (saturnFade * 0.45).toFixed(2);
     saturnEl.style.filter = `blur(${2 + (1 - saturnFade) * 5}px)`;
-    saturnEl.style.transform = `translate3d(${saturnX}px, ${saturnY}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale})`;
+    saturnEl.style.transform = `translate3d(${saturnX.toFixed(1)}px, ${saturnY.toFixed(1)}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale.toFixed(2)})`;
 
     animationFrameId = null;
 }
