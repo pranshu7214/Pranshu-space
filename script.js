@@ -1,56 +1,153 @@
+// ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.0 ========
+// Premium parallax with gravitational lock, depth-of-field, and floating effect
+
+let currentScrollY = 0;
+let animationFrameId = null;
+
+// Performance Cache
+const physicsCache = {
+    elements: null,
+    metrics: null
+};
+
+// Smooth linear interpolation
+function lerp(start, end, progress) {
+    return start + (end - start) * Math.min(Math.max(progress, 0), 1);
+}
+
+// Helper for quadratic bezier curves (for smooth, curved paths)
+function quadraticBezier(p0, p1, p2, t) {
+    const oneMinusT = 1 - t;
+    return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
+}
+
+// Track scroll position
 window.addEventListener("scroll", () => {
-    const scrollPx = window.scrollY;
-    
-    // Target the Library Section to find the "stop" point
-    const librarySection = document.querySelector('.library');
-    if(!librarySection) return; // Guard clause
-
-    const libraryTop = librarySection.offsetTop;
-    // We want them to stop at the vertical center of the library area
-    const libraryCenter = libraryTop + (librarySection.offsetHeight / 2);
-    
-    const jupiter = document.querySelector(".jupiter");
-    const saturn = document.querySelector(".saturn");
-
-    // Calculate progress relative to the library section "stop point"
-    let progress = scrollPx / libraryCenter;
-    if (progress > 1) progress = 1; // This "Clamps" the movement
-
-    // --- JUPITER LOGIC ---
-    // Start: Half-off screen (-250px) -> End: Right side of cards
-    // Using innerWidth * 0.7 to park it on the right side of the landscape cards
-    let jupX = -250 + (progress * (window.innerWidth * 0.7 + 250));
-    let jupY = 20 + (progress * 45); 
-    let jupOp = 0.5 + (progress * 0.3); // Fades from 0.5 to 0.8
-
-    // Apply Jupiter styles
-    jupiter.style.transform = `translateX(${jupX}px)`;
-    jupiter.style.top = `${jupY}%`;
-    jupiter.style.opacity = jupOp;
-
-    // --- SATURN LOGIC ---
-    // Starts appearing after 40% of the way to the library
-    if (progress > 0.4) {
-        let satProg = (progress - 0.4) / 0.6;
-        // Glides in from off-screen left to park next to cards
-        let satX = -300 + (satProg * 400); 
-        
-        saturn.style.transform = `translateX(${satX}px)`;
-        saturn.style.top = `65%`;
-        saturn.style.opacity = satProg * 0.7;
-    } else {
-        saturn.style.opacity = 0;
+    currentScrollY = window.scrollY;
+    if (animationFrameId === null) {
+        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
 });
 
-// MOBILE MENU TOGGLE
-document.addEventListener("DOMContentLoaded", () => {
-    const toggle = document.querySelector(".menu-toggle");
-    const ribbon = document.querySelector(".ribbon");
+// Invalidate metrics on resize to handle layout changes
+window.addEventListener("resize", () => {
+    physicsCache.metrics = null;
+    if (animationFrameId === null) {
+        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+    }
+});
 
-    if(toggle) {
+function updateCinematicPhysics() {
+    // 1. Initialize Elements Cache (Run once)
+    if (!physicsCache.elements) {
+        const jupiterEl = document.querySelector(".jupiter");
+        const saturnEl = document.querySelector(".saturn");
+        const quoteSection = document.getElementById("quote-section");
+        const librarySection = document.getElementById("library-section");
+        const essayCard = document.querySelector(".fire-theme");
+        const footer = document.querySelector("footer");
+
+        if (!jupiterEl || !saturnEl || !quoteSection || !librarySection) {
+            animationFrameId = null;
+            return;
+        }
+        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer };
+    }
+    const { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer } = physicsCache.elements;
+
+    // 2. Initialize Metrics Cache (Run on load & resize)
+    if (!physicsCache.metrics) {
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+        
+        const quoteTop = quoteSection.offsetTop;
+        const quoteHeight = quoteSection.offsetHeight;
+        
+        const libraryTop = librarySection.offsetTop;
+        const essayCardTop = essayCard ? essayCard.offsetTop : libraryTop;
+        const essayCardHeight = essayCard ? essayCard.offsetHeight : 200;
+        const essayCardCenter = essayCardTop + essayCardHeight / 2;
+        
+        const footerTop = footer ? footer.offsetTop : document.body.offsetHeight;
+        const maxScroll = Math.max(document.documentElement.scrollHeight - windowHeight, 1);
+        
+        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll };
+    }
+    const { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll } = physicsCache.metrics;
+    
+    // ACCESSIBILITY: Disable for users who prefer reduced motion
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (motionQuery.matches) {
+        jupiterEl.style.display = 'none';
+        saturnEl.style.display = 'none';
+        animationFrameId = null;
+        return;
+    }
+
+    // ========== JUPITER: SLINGSHOT EXIT (LEFT -> DOWN -> UP-RIGHT) ==========
+    // Active from Start -> Quote Section. Exits exactly as Saturn enters.
+    const jupiterZoneEnd = quoteTop;
+    const jupiterProgress = Math.min(Math.max(currentScrollY / jupiterZoneEnd, 0), 1);
+    
+    const jupiterPath = {
+        p0: { x: -200, y: windowHeight * 0.1 },                  // Start: Top-Left
+        p1: { x: windowWidth * 0.4, y: windowHeight * 1.0 },     // Control: Deep Dip (Bottom)
+        p2: { x: windowWidth + 200, y: -200 }                    // End: Top-Right (Exit Upwards)
+    };
+
+    const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
+    const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
+
+    jupiterEl.style.opacity = 0.6; // Constant visibility
+    jupiterEl.style.filter = `blur(3px)`; // Subtle background blur
+    jupiterEl.style.transform = `translate3d(${jupiterX}px, ${jupiterY}px, 0) rotate(${jupiterProgress * 45}deg)`;
+
+    // ========== SATURN: CURVED PATH (RIGHT -> DIP -> LEFT & UP) ==========
+    // Starts at Quote, dips behind cards, moves Left & Upwards
+    const saturnZoneStart = quoteTop; // Animation starts when quote section is at the top
+    const saturnZoneEnd = maxScroll;
+    const saturnZoneHeight = Math.max(saturnZoneEnd - saturnZoneStart, 1);
+
+    let saturnProgress = 0;
+    if (currentScrollY >= saturnZoneStart) {
+        saturnProgress = Math.min(Math.max((currentScrollY - saturnZoneStart) / saturnZoneHeight, 0), 1);
+    }
+
+    // Path: Right (Mid) -> Deep Dip (Bottom) -> Left (Upper)
+    const saturnPath = {
+        p0: { x: windowWidth + 100, y: windowHeight * 0.3 },     // Start: Right (Enter)
+        p1: { x: windowWidth * 0.5, y: windowHeight * 1.2 },     // Control: Deep Dip (Goes low)
+        p2: { x: -280, y: windowHeight * 0.1 }                   // End: Left (Tail visible, High)
+    };
+
+    const saturnX = quadraticBezier(saturnPath.p0.x, saturnPath.p1.x, saturnPath.p2.x, saturnProgress);
+    const saturnY = quadraticBezier(saturnPath.p0.y, saturnPath.p1.y, saturnPath.p2.y, saturnProgress);
+
+    // Fade in Saturn as it enters the zone
+    const saturnFade = Math.min(saturnProgress * 4, 1); // Quick fade in
+
+    // Extra: Scale effect to simulate 3D depth (larger when lower/closer)
+    const saturnScale = 0.9 + 0.3 * Math.sin(saturnProgress * Math.PI);
+
+    saturnEl.style.opacity = (saturnFade * 0.6).toFixed(2);
+    saturnEl.style.filter = `blur(${2 + (1 - saturnFade) * 5}px)`;
+    saturnEl.style.transform = `translate3d(${saturnX}px, ${saturnY}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale})`;
+
+    animationFrameId = null;
+}
+
+// ========== MOBILE MENU TOGGLE ==========
+document.addEventListener("DOMContentLoaded", () => {
+    // Initialize physics immediately
+    updateCinematicPhysics();
+
+    const toggle = document.querySelector(".menu-toggle");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    if (toggle) {
         toggle.addEventListener("click", () => {
-            ribbon.classList.toggle("menu-open");
+            const isFlex = mobileMenu.style.display === "flex";
+            mobileMenu.style.display = isFlex ? "none" : "flex";
         });
     }
 });
