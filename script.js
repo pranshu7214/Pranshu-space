@@ -78,7 +78,7 @@ function updateCinematicPhysics() {
     const { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll } = physicsCache.metrics;
     
     // Smooth out the scroll value (Linear Interpolation)
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.08);
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.12);
     
     // Parallax Background
     if (spaceBg) spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(1)}px, 0)`;
@@ -107,7 +107,7 @@ function updateCinematicPhysics() {
     const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
 
     jupiterEl.style.opacity = 0.6; // Constant visibility
-    jupiterEl.style.filter = `blur(3px)`; // Subtle background blur
+    // Removed repetitive filter assignment
     jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(1)}px, ${jupiterY.toFixed(1)}px, 0) rotate(${jupiterProgress * 45}deg)`;
 
     // ========== SATURN: CURVED PATH (RIGHT -> DIP -> LEFT & UP) ==========
@@ -138,7 +138,7 @@ function updateCinematicPhysics() {
     const saturnScale = 0.9 + 0.3 * Math.sin(saturnProgress * Math.PI);
 
     saturnEl.style.opacity = (saturnFade * 0.45).toFixed(2);
-    saturnEl.style.filter = `blur(${2 + (1 - saturnFade) * 5}px)`;
+    // Removed dynamic blur
     saturnEl.style.transform = `translate3d(${saturnX.toFixed(1)}px, ${saturnY.toFixed(1)}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale.toFixed(2)})`;
     
     if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
