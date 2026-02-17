@@ -1,29 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Poems</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poems | Pranshu’s Library</title>
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<div class="container">
+  <div class="space-bg"></div>
 
-<h1>Poems</h1>
+  <header class="ribbon">
+    <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
 
-<nav>
-<a href="index.html">Home</a>
-<a href="essays.html">Essays</a>
-<a href="fiction.html">Fiction</a>
-<a href="about.html">About</a>
-</nav>
+    <nav class="nav-left desktop-only">
+      <a href="poems.html" style="color: #FFD700;">Poems</a>
+      <a href="essays.html">Essays</a>
+      <a href="fiction.html">Fiction</a>
+    </nav>
 
-<p>
-Your poems will live here.
-</p>
+    <div class="nav-logo">
+      <a href="index.html">
+        <img src="images/final logo.png" alt="Logo">
+      </a>
+    </div>
 
-</div>
+    <nav class="nav-right desktop-only">
+      <a href="about.html">About</a>
+      
+      <div class="nav-socials">
+         <a href="YOUR_INSTAGRAM_URL_HERE" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+         <a href="YOUR_TWITTER_URL_HERE" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i></a>
+         <a href="mailto:pranshu.writes@gmail.com" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-envelope"></i></a>
+      </div>
+    </nav>
+  </header>
 
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="mobile-nav-overlay">
+      <a href="poems.html">Poems</a>
+      <a href="essays.html">Essays</a>
+      <a href="fiction.html">Fiction</a>
+      <a href="about.html">About</a>
+  </div>
+
+  <main style="padding-top: 160px; min-height: 100vh; display: flex; flex-direction: column;">
+    <section style="flex: 1; text-align: center; padding: 0 2rem;">
+      <h1 style="font-size: 3rem; margin-bottom: 2rem;">Poems</h1>
+      <p style="font-size: 1.2rem; color: #ccc;">The collection of poems will appear here.</p>
+    </section>
+
+    <footer>
+      <p>© 2026 Pranshu. All rights reserved.</p>
+      <div class="footer-icons desktop-only">
+        <a href="https://www.instagram.com/pranshu.writes/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://twitter.com/pranshu_writes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="mailto:pranshu.writes@gmail.com" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-envelope"></i></a>
+      </div>
+      <div class="footer-contact">
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>

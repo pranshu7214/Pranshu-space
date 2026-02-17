@@ -276,6 +276,7 @@ footer {
 @media (max-width: 900px) {
   /* Planets REMOVED for mobile */
   .planet { display: none !important; }
+  .footer-contact { display: flex; }
 
   /* Ribbon Changes */
   .ribbon { justify-content: space-between; padding: 0 2rem; height: 90px; }
