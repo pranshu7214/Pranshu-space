@@ -1,7 +1,8 @@
 // ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.0 ========
 // Premium parallax with gravitational lock, depth-of-field, and floating effect
 
-let currentScrollY = 0;
+let currentScrollY = window.scrollY;
+let targetScrollY = window.scrollY;
 let animationFrameId = null;
 
 // Performance Cache
@@ -23,7 +24,7 @@ function quadraticBezier(p0, p1, p2, t) {
 
 // Track scroll position
 window.addEventListener("scroll", () => {
-    currentScrollY = window.scrollY;
+    targetScrollY = window.scrollY;
     if (animationFrameId === null) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
@@ -46,14 +47,15 @@ function updateCinematicPhysics() {
         const librarySection = document.getElementById("library-section");
         const essayCard = document.querySelector(".fire-theme");
         const footer = document.querySelector("footer");
+        const spaceBg = document.querySelector(".space-bg");
 
         if (!jupiterEl || !saturnEl || !quoteSection || !librarySection) {
             animationFrameId = null;
             return;
         }
-        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer };
+        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg };
     }
-    const { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer } = physicsCache.elements;
+    const { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg } = physicsCache.elements;
 
     // 2. Initialize Metrics Cache (Run on load & resize)
     if (!physicsCache.metrics) {
@@ -74,6 +76,12 @@ function updateCinematicPhysics() {
         physicsCache.metrics = { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll };
     }
     const { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll } = physicsCache.metrics;
+    
+    // Smooth out the scroll value (Linear Interpolation)
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.08);
+    
+    // Parallax Background
+    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(1)}px, 0)`;
     
     // ACCESSIBILITY: Disable for users who prefer reduced motion
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -115,9 +123,9 @@ function updateCinematicPhysics() {
 
     // Path: Right (Mid) -> Deep Dip (Bottom) -> Left (Upper)
     const saturnPath = {
-        p0: { x: windowWidth + 100, y: windowHeight * 0.3 },     // Start: Right (Enter)
-        p1: { x: windowWidth * 0.5, y: windowHeight * 1.2 },     // Control: Deep Dip (Goes low)
-        p2: { x: -280, y: windowHeight * 0.1 }                   // End: Left (Tail visible, High)
+        p0: { x: windowWidth + 100, y: windowHeight * 0.2 },     // Start: Right (Enter)
+        p1: { x: windowWidth * 0.5, y: windowHeight * 0.9 },     // Control: Deep Dip (Goes down)
+        p2: { x: -250, y: windowHeight * 0.15 }                  // End: Left (Ascends, Tail visible)
     };
 
     const saturnX = quadraticBezier(saturnPath.p0.x, saturnPath.p1.x, saturnPath.p2.x, saturnProgress);
@@ -132,8 +140,12 @@ function updateCinematicPhysics() {
     saturnEl.style.opacity = (saturnFade * 0.45).toFixed(2);
     saturnEl.style.filter = `blur(${2 + (1 - saturnFade) * 5}px)`;
     saturnEl.style.transform = `translate3d(${saturnX.toFixed(1)}px, ${saturnY.toFixed(1)}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale.toFixed(2)})`;
-
-    animationFrameId = null;
+    
+    if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
+        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+    } else {
+        animationFrameId = null;
+    }
 }
 
 // ========== MOBILE MENU TOGGLE ==========
