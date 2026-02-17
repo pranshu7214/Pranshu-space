@@ -41,6 +41,7 @@ body {
   will-change: transform, opacity, filter; /* Performance hint for the browser */
   transform: translateZ(0); /* Force hardware acceleration */
   backface-visibility: hidden;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out, filter 0.2s ease-out;
 }
 
 /* Initial States */
@@ -74,7 +75,7 @@ body {
 
 /* Layout Grid: Left Nav | Logo | Right Nav */
 .nav-left, .nav-right {
-  flex: 0 0 auto;
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 4rem; /* Increased gap between words */
@@ -236,7 +237,7 @@ body {
     
     .card:hover .card-title {
         transform: translateY(-10px) scale(0.9);
-        opacity: 0.6; /* Fades into background */
+        opacity: 0.2; /* Fades into background */
     }
 
     .card:hover .card-quote {
@@ -253,14 +254,14 @@ body {
 /* --- FOOTER --- */
 footer { 
     position: relative; z-index: 60; /* Above planets */
-    text-align: center; padding: 5rem 2rem; 
+    text-align: center; padding: 2rem 2rem; 
     background: rgba(5, 5, 5, 0.7); /* Semi-transparent background for blur effect */
     backdrop-filter: blur(15px);
     border-top: 1px solid rgba(255,255,255,0.1); 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2rem;
+    gap: 1rem;
 }
 
 .footer-icons a { 
@@ -277,6 +278,13 @@ footer {
   .ribbon { justify-content: space-between; padding: 0 2rem; height: 90px; }
   .desktop-only { display: none; }
   .menu-toggle { display: block; font-size: 1.8rem; color: #fff; cursor: pointer; }
+
+  /* Center Logo on Mobile */
+  .nav-logo {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+  }
 
   /* Adjust Logo for Mobile Ribbon */
   .nav-logo img { 
