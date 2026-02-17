@@ -41,7 +41,7 @@ body {
   will-change: transform, opacity, filter; /* Performance hint for the browser */
   transform: translateZ(0); /* Force hardware acceleration */
   backface-visibility: hidden;
-  transition: transform 0.2s ease-out, opacity 0.2s ease-out, filter 0.2s ease-out;
+  transition: opacity 0.2s ease-out;
 }
 
 /* Initial States */
