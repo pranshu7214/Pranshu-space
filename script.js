@@ -47,14 +47,15 @@ function updateCinematicPhysics() {
         const librarySection = document.getElementById("library-section");
         const essayCard = document.querySelector(".fire-theme");
         const footer = document.querySelector("footer");
+        const spaceBg = document.querySelector(".space-bg");
 
         if (!jupiterEl || !saturnEl || !quoteSection || !librarySection) {
             animationFrameId = null;
             return;
         }
-        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer };
+        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg };
     }
-    const { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer } = physicsCache.elements;
+    const { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg } = physicsCache.elements;
 
     // 2. Initialize Metrics Cache (Run on load & resize)
     if (!physicsCache.metrics) {
@@ -78,6 +79,9 @@ function updateCinematicPhysics() {
     
     // Smooth out the scroll value (Linear Interpolation)
     currentScrollY = lerp(currentScrollY, targetScrollY, 0.08);
+    
+    // Parallax Background
+    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(1)}px, 0)`;
     
     // ACCESSIBILITY: Disable for users who prefer reduced motion
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
