@@ -25,10 +25,29 @@ body {
   position: fixed;
   top: -10vh; left: 0;
   width: 100%; height: 120vh;
-  background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
               url("images/universe.jpg") center/cover no-repeat;
   z-index: -5;
   will-change: transform;
+  filter: contrast(1.2) brightness(1.1) hue-rotate(15deg);
+}
+
+/* Page Specific Backgrounds */
+.space-bg.bg-poems {
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+              url("images/bg-poems.jpg");
+}
+.space-bg.bg-essays {
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+              url("images/bg-essays.jpg");
+}
+.space-bg.bg-fiction {
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+              url("images/bg-fiction.jpg");
+}
+.space-bg.bg-about {
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+              url("images/bg-about.jpg");
 }
 
 /* PLANETS: Fixed by default, JS controls position */
@@ -150,7 +169,7 @@ body {
   margin-bottom: 2rem; 
 }
 
-.spinning-logo { width: 280px; opacity: 0.9; animation: spinForever 25s infinite linear; }
+.spinning-logo { width: 280px; opacity: 0.9; animation: spinForever 25s infinite linear; will-change: transform; }
 @keyframes spinForever { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* --- QUOTE --- */
@@ -283,6 +302,26 @@ footer {
   /* Planets REMOVED for mobile */
   .planet { display: none !important; }
   .footer-contact { display: none; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+  
+  /* Mobile Background Override */
+  .space-bg {
+      background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+                  url("images/universe-mobile.jpg") center/cover no-repeat;
+      background-attachment: scroll; /* Fixes scroll lag */
+  }
+
+  /* PERFORMANCE PATCH: Disable heavy effects on mobile */
+  .ribbon, .card, .mobile-nav-overlay, footer {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: rgba(10, 10, 15, 0.95) !important;
+  }
+  
+  .card, .ribbon, .nav-logo img {
+      box-shadow: none !important;
+      filter: none !important;
+  }
+
   .social-row a {
     color: #ccc; text-decoration: none; font-size: 1rem;
     display: flex; align-items: center; gap: 10px;
@@ -313,6 +352,7 @@ footer {
       background: rgba(0,0,0,0.95);
       flex-direction: column; padding: 2rem; gap: 2rem;
       border-bottom: 1px solid #333;
+      z-index: 2000;
   }
   .mobile-nav-overlay a {
       color: #fff; font-size: 1.5rem; text-decoration: none; text-transform: uppercase;

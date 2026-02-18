@@ -45,14 +45,10 @@ function updateCinematicPhysics() {
         const saturnEl = document.querySelector(".saturn");
         const quoteSection = document.getElementById("quote-section");
         const librarySection = document.getElementById("library-section");
-        const essayCard = document.querySelector(".fire-theme");
+        const essayCard = document.querySelector(".earth-theme");
         const footer = document.querySelector("footer");
         const spaceBg = document.querySelector(".space-bg");
 
-        if (!jupiterEl || !saturnEl || !quoteSection || !librarySection) {
-            animationFrameId = null;
-            return;
-        }
         physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg };
     }
     const { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg } = physicsCache.elements;
@@ -61,12 +57,12 @@ function updateCinematicPhysics() {
     if (!physicsCache.metrics) {
         const windowHeight = window.innerHeight;
         const windowWidth = window.innerWidth;
+
+        const quoteTop = quoteSection ? quoteSection.offsetTop : 0;
+        const quoteHeight = quoteSection ? quoteSection.offsetHeight : 0;
         
-        const quoteTop = quoteSection.offsetTop;
-        const quoteHeight = quoteSection.offsetHeight;
-        
-        const libraryTop = librarySection.offsetTop;
-        const essayCardTop = essayCard ? essayCard.offsetTop : libraryTop;
+        const libraryTop = librarySection ? librarySection.offsetTop : 0;
+        const essayCardTop = essayCard ? essayCard.offsetTop : 0;
         const essayCardHeight = essayCard ? essayCard.offsetHeight : 200;
         const essayCardCenter = essayCardTop + essayCardHeight / 2;
         
@@ -83,6 +79,19 @@ function updateCinematicPhysics() {
     // Parallax Background
     if (spaceBg) spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(1)}px, 0)`;
     
+    // MOBILE OPTIMIZATION: Stop physics calculations on mobile to prevent lag
+    if (windowWidth < 900) {
+        animationFrameId = null;
+        return;
+    }
+
+    // If we are on a subpage (no planets), just keep the loop running for parallax and exit
+    if (!jupiterEl || !saturnEl || !quoteSection) {
+        if (Math.abs(targetScrollY - currentScrollY) > 0.5) animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+        else animationFrameId = null;
+        return;
+    }
+
     // ACCESSIBILITY: Disable for users who prefer reduced motion
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (motionQuery.matches) {
