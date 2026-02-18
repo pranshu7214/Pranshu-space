@@ -1,7 +1,7 @@
 :root {
   --font-main: "Spectral", serif;
   --text-color: #e0e0e0;
-  --ribbon-bg: rgba(5, 10, 15, 0.9); /* Slightly darker for contrast */
+  --ribbon-bg: rgba(5, 10, 15, 0.6); /* Slightly darker for contrast */
   
   /* UPDATED THEME COLORS */
   --color-earth: #2E8B57; /* SeaGreen - Natural Earth */
@@ -29,6 +29,7 @@ body {
               url("images/universe.jpg") center/cover no-repeat;
   z-index: -5;
   will-change: transform;
+  backface-visibility: hidden; /* Force GPU acceleration */
   filter: contrast(1.2) brightness(1.1) hue-rotate(15deg);
 }
 
@@ -283,7 +284,7 @@ body {
 footer { 
     position: relative; z-index: 60; /* Above planets */
     text-align: center; padding: 1rem 2rem; 
-    background: rgba(5, 5, 5, 0.7); /* Semi-transparent background for blur effect */
+    background: rgba(5, 5, 5, 0.4); /* Semi-transparent background for blur effect */
     backdrop-filter: blur(15px);
     border-top: 1px solid rgba(255,255,255,0.1); 
     display: flex;
@@ -306,6 +307,8 @@ footer {
   /* Mobile Background Override */
   .space-bg {
       background-attachment: scroll !important; /* Fixes scroll lag */
+      filter: none !important; /* Disable heavy filters */
+      will-change: auto !important; /* Save memory on mobile */
   }
 
   /* PERFORMANCE PATCH: Disable heavy effects on mobile */

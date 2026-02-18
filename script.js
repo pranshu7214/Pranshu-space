@@ -73,17 +73,17 @@ function updateCinematicPhysics() {
     }
     const { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll } = physicsCache.metrics;
     
-    // Smooth out the scroll value (Linear Interpolation)
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.12);
-    
-    // Parallax Background
-    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(1)}px, 0)`;
-    
     // MOBILE OPTIMIZATION: Stop physics calculations on mobile to prevent lag
     if (windowWidth < 900) {
         animationFrameId = null;
         return;
     }
+
+    // Smooth out the scroll value (Linear Interpolation)
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.12);
+    
+    // Parallax Background
+    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(1)}px, 0)`;
 
     // If we are on a subpage (no planets), just keep the loop running for parallax and exit
     if (!jupiterEl || !saturnEl || !quoteSection) {
