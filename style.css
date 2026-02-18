@@ -305,9 +305,7 @@ footer {
   
   /* Mobile Background Override */
   .space-bg {
-      background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-                  url("images/universe-mobile.jpg") center/cover no-repeat !important;
-      background-attachment: scroll; /* Fixes scroll lag */
+      background-attachment: scroll !important; /* Fixes scroll lag */
   }
 
   /* PERFORMANCE PATCH: Disable heavy effects on mobile */
@@ -372,4 +370,18 @@ footer {
       height: auto; opacity: 0.7; font-size: 0.9rem; display: block; 
   }
   .card-quote p { margin-top: 0.5rem; font-size: 1rem; }
+}
+
+/* --- MOBILE BACKGROUND FIX --- */
+@media (max-width: 768px) {
+    .space-bg {
+        /* Center it so you see the core of the galaxy */
+        background-position: center center !important;
+        
+        /* Ensure it covers the full height of the phone */
+        background-size: cover !important;
+        
+        /* Prevents the "tearing" lag when scrolling */
+        background-attachment: scroll !important;
+    }
 }
