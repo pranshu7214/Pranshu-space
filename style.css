@@ -64,7 +64,7 @@ body {
 .ribbon {
   position: fixed;
   top: 0; width: 100%; 
-  height: 120px; /* Bigger ribbon */
+  height: 105px; /* Bigger ribbon */
   background: var(--ribbon-bg);
   backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -117,6 +117,12 @@ body {
 /* Yellow Hover */
 .nav-left a:hover, .nav-right a:hover, .nav-socials a:hover { 
   color: #FFD700; 
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
+/* Active State (Static Yellow) */
+.nav-left a.active, .nav-right a.active {
+  color: #FFD700;
   text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
 }
 
@@ -283,7 +289,7 @@ footer {
     transition: color 0.3s; }
 
   /* Ribbon Changes */
-  .ribbon { justify-content: space-between; padding: 0 2rem; height: 90px; }
+  .ribbon { justify-content: space-between; padding: 0 2rem; height: 75px; }
   .desktop-only { display: none; }
   .menu-toggle { display: block; font-size: 1.8rem; color: #fff; cursor: pointer; }
 
@@ -303,7 +309,7 @@ footer {
   /* Mobile Menu Overlay */
   .mobile-nav-overlay {
       display: none; /* JS toggles flex */
-      position: fixed; top: 90px; left: 0; width: 100%;
+      position: fixed; top: 75px; left: 0; width: 100%;
       background: rgba(0,0,0,0.95);
       flex-direction: column; padding: 2rem; gap: 2rem;
       border-bottom: 1px solid #333;
