@@ -28,7 +28,8 @@ body {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
               url("images/universe.jpg") center/cover no-repeat;
   z-index: -5;
-  will-change: transform;
+  will-change: transform, opacity;
+  transform: translateZ(0); /* This forces a new GPU layer */
   backface-visibility: hidden; /* Force GPU acceleration */
   filter: contrast(1.2) brightness(1.1) hue-rotate(15deg);
 }
@@ -60,10 +61,9 @@ body {
   background-size: contain;
   pointer-events: none;
   z-index: 1; /* In front of background, behind quote and cards */
-  will-change: transform, opacity, filter; /* Performance hint for the browser */
+  will-change: transform, opacity;
   transform: translateZ(0); /* Force hardware acceleration */
   backface-visibility: hidden;
-  will-change: transform, opacity;
   contain: layout paint;
 }
 
@@ -213,6 +213,9 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth easing */
   border: 1px solid rgba(255,255,255,0.1);
+  will-change: transform, opacity;
+  transform: translateZ(0); /* This forces a new GPU layer */
+  backface-visibility: hidden;
 }
 
 /* Theme Borders & Colors */
