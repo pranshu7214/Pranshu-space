@@ -9,7 +9,10 @@
   --color-water: #0077BE; /* Ocean Blue */
 }
 
-html { scroll-behavior: smooth; }
+/* Smooth scroll only on desktop - causes lag on mobile */
+@media (min-width: 901px) {
+  html { scroll-behavior: smooth; }
+}
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -64,6 +67,7 @@ body {
   transform: translateZ(0); /* Force hardware acceleration */
   backface-visibility: hidden;
   contain: layout paint;
+  transition: transform 0.18s ease-out;
 }
 
 /* Initial States */
@@ -170,8 +174,24 @@ body {
   margin-bottom: 2rem; 
 }
 
-.spinning-logo { width: 280px; opacity: 0.9; animation: spinForever 25s infinite linear; will-change: transform; }
-@keyframes spinForever { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.spinning-logo { 
+  width: 280px; 
+  opacity: 0.9; 
+  animation: spinForever 25s infinite linear; 
+  will-change: transform; 
+}
+@keyframes spinForever { 
+  from { transform: rotate(0deg); } 
+  to { transform: rotate(360deg); } 
+}
+
+/* Disable spinning logo animation on mobile to reduce lag */
+@media (max-width: 900px) {
+  .spinning-logo {
+    animation: none !important;
+    will-change: auto !important;
+  }
+}
 
 /* --- QUOTE --- */
 .about {
@@ -195,6 +215,14 @@ body {
     animation: quoteGlow 4s ease-in-out infinite;
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
     letter-spacing: 0.05em;
+}
+
+/* Disable quote glow animation on mobile to reduce lag */
+@media (max-width: 900px) {
+  .quote-text {
+    animation: none !important;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3) !important;
+  }
 }
 .highlight { color: #fff; font-weight: 600; text-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
 
@@ -307,11 +335,13 @@ footer {
   /* Planets REMOVED for mobile */
   .planet { display: none !important; }
   
-  /* Mobile Background Override */
+  /* Mobile Background Override - COMPLETE DISABLE of parallax */
   .space-bg {
       background-attachment: scroll !important; /* Fixes scroll lag */
       filter: none !important; /* Disable heavy filters */
       will-change: auto !important; /* Save memory on mobile */
+      transform: none !important; /* Disable parallax transform completely */
+      position: fixed !important; /* Keep fixed but no transform */
   }
 
   /* PERFORMANCE PATCH: Disable heavy effects on mobile */

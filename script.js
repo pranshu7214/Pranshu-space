@@ -1,9 +1,13 @@
-// ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.0 ========
-// Premium parallax + planet motion
+// ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.1 ========
+// Premium parallax + planet motion, tuned for smoothness & performance
 
 let currentScrollY = window.scrollY;
 let targetScrollY = window.scrollY;
 let animationFrameId = null;
+
+// Throttle heavy planet math to ~30fps (parallax can feel 60fps due to interpolation)
+const PHYSICS_INTERVAL_MS = 34;
+let lastPhysicsTime = 0;
 
 // Performance Cache
 const physicsCache = {
@@ -30,12 +34,13 @@ window.addEventListener("scroll", () => {
     }
 }, { passive: true });
 
-// Debounce resize to avoid recalc storms
+// Debounce resize to avoid recalc storms, but invalidate metrics immediately
 let resizeTimeout = null;
 window.addEventListener("resize", () => {
+    // Always drop cached metrics right away so next frame uses fresh dimensions
+    physicsCache.metrics = null;
     if (resizeTimeout) clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-        physicsCache.metrics = null;
         resizeTimeout = null;
         if (animationFrameId === null) {
             animationFrameId = requestAnimationFrame(updateCinematicPhysics);
@@ -43,7 +48,12 @@ window.addEventListener("resize", () => {
     }, 150);
 });
 
-function updateCinematicPhysics() {
+function updateCinematicPhysics(now) {
+    now = now || performance.now();
+    const elapsed = now - lastPhysicsTime;
+    const shouldRunHeavyStep = elapsed >= PHYSICS_INTERVAL_MS || lastPhysicsTime === 0;
+    if (shouldRunHeavyStep) lastPhysicsTime = now;
+
     // 1. Initialize Elements Cache (Run once)
     if (!physicsCache.elements) {
         const jupiterEl = document.querySelector(".jupiter");
@@ -92,17 +102,21 @@ function updateCinematicPhysics() {
     }
     const { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll, jupiterPath, saturnPath } = physicsCache.metrics;
     
-    // MOBILE OPTIMIZATION: Stop physics calculations on mobile to prevent lag
+    // MOBILE OPTIMIZATION: Stop ALL physics calculations on mobile to prevent lag
     if (windowWidth < 900) {
+        // Disable parallax on mobile - it causes scroll lag
+        if (spaceBg) spaceBg.style.transform = 'none';
         animationFrameId = null;
         return;
     }
 
     // Smooth out the scroll value (Linear Interpolation)
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.12);
+    // Slightly higher interpolation factor = a bit more responsive but still smooth
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.16);
 
-    const parallaxY = currentScrollY * 0.05;
-    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${parallaxY.toFixed(2)}px, 0)`;
+    // Light but noticeable parallax across all pages (desktop only)
+    const parallaxY = currentScrollY * 0.08;
+    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${parallaxY.toFixed(1)}px, 0)`;
 
     // If we are on a subpage (no planets), just keep the loop running for parallax and exit
     if (!jupiterEl || !saturnEl || !quoteSection) {
@@ -117,6 +131,16 @@ function updateCinematicPhysics() {
         jupiterEl.style.display = 'none';
         saturnEl.style.display = 'none';
         animationFrameId = null;
+        return;
+    }
+
+    // If we're in a frame where we only want parallax smoothing, skip heavy math
+    if (!shouldRunHeavyStep) {
+        if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
+            animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+        } else {
+            animationFrameId = null;
+        }
         return;
     }
 
@@ -164,7 +188,8 @@ function updateCinematicPhysics() {
 
 // ========== MOBILE MENU TOGGLE ==========
 document.addEventListener("DOMContentLoaded", () => {
-    updateCinematicPhysics();
+    lastPhysicsTime = 0;
+    updateCinematicPhysics(performance.now());
 
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
