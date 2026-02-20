@@ -194,10 +194,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
 
-    if (toggle) {
-        toggle.addEventListener("click", () => {
+    if (toggle && mobileMenu) {
+        toggle.addEventListener("click", (e) => {
+            e.stopPropagation(); // Prevent click from bubbling to document
             const isFlex = mobileMenu.style.display === "flex";
             mobileMenu.style.display = isFlex ? "none" : "flex";
+        });
+
+        // Close menu when clicking outside (on the homepage content)
+        document.addEventListener("click", (e) => {
+            if (mobileMenu.style.display === "flex" && !mobileMenu.contains(e.target)) {
+                mobileMenu.style.display = "none";
+            }
+        });
+
+        // Close menu when clicking a link inside the menu
+        mobileMenu.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                mobileMenu.style.display = "none";
+            });
         });
     }
 });

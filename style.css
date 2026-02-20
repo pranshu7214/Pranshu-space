@@ -28,7 +28,7 @@ body {
   position: fixed;
   top: -10vh; left: 0;
   width: 100%; height: 120vh;
-  background: url("images/universe.jpg") center/cover no-repeat;
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("images/universe.jpg") center/cover no-repeat;
   z-index: -5;
   will-change: transform;
   transform: translateZ(0);
@@ -38,19 +38,19 @@ body {
 
 /* Page Specific Backgrounds */
 .space-bg.bg-poems {
-  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
               url("images/bg-poems.jpg");
 }
 .space-bg.bg-essays {
-  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
               url("images/bg-essays.jpg");
 }
 .space-bg.bg-fiction {
-  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
               url("images/bg-fiction.jpg");
 }
 .space-bg.bg-about {
-  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%),
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
               url("images/bg-about.jpg");
 }
 
