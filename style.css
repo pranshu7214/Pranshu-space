@@ -25,13 +25,12 @@ body {
   position: fixed;
   top: -10vh; left: 0;
   width: 100%; height: 120vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
-              url("images/universe.jpg") center/cover no-repeat;
+  background: url("images/universe.jpg") center/cover no-repeat;
   z-index: -5;
-  will-change: transform, opacity;
-  transform: translateZ(0); /* This forces a new GPU layer */
-  backface-visibility: hidden; /* Force GPU acceleration */
-  filter: contrast(1.2) brightness(1.1) hue-rotate(15deg);
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* No filter here - improves scroll/parallax performance */
 }
 
 /* Page Specific Backgrounds */
@@ -86,7 +85,8 @@ body {
   top: 0; width: 100%; 
   height: 105px; /* Bigger ribbon */
   background: var(--ribbon-bg);
-  backdrop-filter: blur(15px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255,255,255,0.1);
   display: flex;
   justify-content: space-between; /* Spread left, center, right */
@@ -213,8 +213,7 @@ body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth easing */
   border: 1px solid rgba(255,255,255,0.1);
-  will-change: transform, opacity;
-  transform: translateZ(0); /* This forces a new GPU layer */
+  transform: translateZ(0);
   backface-visibility: hidden;
 }
 
@@ -260,6 +259,7 @@ body {
 @media (hover: hover) {
     .card:hover {
         height: 240px; /* Expands slightly */
+        will-change: transform, opacity;
     }
     
     /* Hover Colors - Not Black */
@@ -287,8 +287,9 @@ body {
 footer { 
     position: relative; z-index: 60; /* Above planets */
     text-align: center; padding: 1rem 2rem; 
-    background: rgba(5, 5, 5, 0.4); /* Semi-transparent background for blur effect */
-    backdrop-filter: blur(15px);
+    background: rgba(5, 5, 5, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid rgba(255,255,255,0.1); 
     display: flex;
     flex-direction: column;
@@ -305,7 +306,6 @@ footer {
 @media (max-width: 900px) {
   /* Planets REMOVED for mobile */
   .planet { display: none !important; }
-  .footer-contact { display: none; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
   
   /* Mobile Background Override */
   .space-bg {
@@ -376,6 +376,27 @@ footer {
       height: auto; opacity: 0.7; font-size: 0.9rem; display: block; 
   }
   .card-quote p { margin-top: 0.5rem; font-size: 1rem; }
+}
+
+/* --- ABOUT PAGE --- */
+.page-main {
+  padding-top: 160px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.page-content {
+  flex: 1;
+  text-align: center;
+  padding: 0 2rem;
+}
+.page-content h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+}
+.page-content .tagline {
+  font-size: 1.2rem;
+  color: #ccc;
 }
 
 /* --- MOBILE BACKGROUND FIX --- */

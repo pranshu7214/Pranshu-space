@@ -1,5 +1,5 @@
 // ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.0 ========
-// Premium parallax with gravitational lock, depth-of-field, and floating effect
+// Premium parallax + planet motion
 
 let currentScrollY = window.scrollY;
 let targetScrollY = window.scrollY;
@@ -22,20 +22,25 @@ function quadraticBezier(p0, p1, p2, t) {
     return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
 }
 
-// Track scroll position
+// Track scroll position (passive for better scroll performance)
 window.addEventListener("scroll", () => {
     targetScrollY = window.scrollY;
     if (animationFrameId === null) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
-});
+}, { passive: true });
 
-// Invalidate metrics on resize to handle layout changes
+// Debounce resize to avoid recalc storms
+let resizeTimeout = null;
 window.addEventListener("resize", () => {
-    physicsCache.metrics = null;
-    if (animationFrameId === null) {
-        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
-    }
+    if (resizeTimeout) clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        physicsCache.metrics = null;
+        resizeTimeout = null;
+        if (animationFrameId === null) {
+            animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+        }
+    }, 150);
 });
 
 function updateCinematicPhysics() {
@@ -49,6 +54,7 @@ function updateCinematicPhysics() {
         const footer = document.querySelector("footer");
         const spaceBg = document.querySelector(".space-bg");
 
+        if (jupiterEl) jupiterEl.style.opacity = "0.6";
         physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg };
     }
     const { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg } = physicsCache.elements;
@@ -69,9 +75,22 @@ function updateCinematicPhysics() {
         const footerTop = footer ? footer.offsetTop : document.body.offsetHeight;
         const maxScroll = Math.max(document.documentElement.scrollHeight - windowHeight, 1);
         
-        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll };
+        // Pre-calculate paths to avoid object creation every frame
+        const jupiterPath = {
+            p0: { x: -200, y: windowHeight * 0.1 },
+            p1: { x: windowWidth * 0.4, y: windowHeight * 1.0 },
+            p2: { x: windowWidth + 200, y: -200 }
+        };
+
+        const saturnPath = {
+            p0: { x: windowWidth + 100, y: windowHeight * 0.2 },
+            p1: { x: windowWidth * 0.5, y: windowHeight * 0.9 },
+            p2: { x: -250, y: windowHeight * 0.15 }
+        };
+
+        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll, jupiterPath, saturnPath };
     }
-    const { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll } = physicsCache.metrics;
+    const { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll, jupiterPath, saturnPath } = physicsCache.metrics;
     
     // MOBILE OPTIMIZATION: Stop physics calculations on mobile to prevent lag
     if (windowWidth < 900) {
@@ -81,9 +100,9 @@ function updateCinematicPhysics() {
 
     // Smooth out the scroll value (Linear Interpolation)
     currentScrollY = lerp(currentScrollY, targetScrollY, 0.12);
-    
-    // Parallax Background
-    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(1)}px, 0)`;
+
+    const parallaxY = currentScrollY * 0.05;
+    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${parallaxY.toFixed(2)}px, 0)`;
 
     // If we are on a subpage (no planets), just keep the loop running for parallax and exit
     if (!jupiterEl || !saturnEl || !quoteSection) {
@@ -106,18 +125,11 @@ function updateCinematicPhysics() {
     const jupiterZoneEnd = quoteTop;
     const jupiterProgress = Math.min(Math.max(currentScrollY / jupiterZoneEnd, 0), 1);
     
-    const jupiterPath = {
-        p0: { x: -200, y: windowHeight * 0.1 },                  // Start: Top-Left
-        p1: { x: windowWidth * 0.4, y: windowHeight * 1.0 },     // Control: Deep Dip (Bottom)
-        p2: { x: windowWidth + 200, y: -200 }                    // End: Top-Right (Exit Upwards)
-    };
-
     const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
     const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
 
-    jupiterEl.style.opacity = 0.6; // Constant visibility
     // Removed repetitive filter assignment
-    jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(1)}px, ${jupiterY.toFixed(1)}px, 0) rotate(${jupiterProgress * 45}deg)`;
+    jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterProgress * 45}deg)`;
 
     // ========== SATURN: CURVED PATH (RIGHT -> DIP -> LEFT & UP) ==========
     // Starts at Quote, dips behind cards, moves Left & Upwards
@@ -130,13 +142,6 @@ function updateCinematicPhysics() {
         saturnProgress = Math.min(Math.max((currentScrollY - saturnZoneStart) / saturnZoneHeight, 0), 1);
     }
 
-    // Path: Right (Mid) -> Deep Dip (Bottom) -> Left (Upper)
-    const saturnPath = {
-        p0: { x: windowWidth + 100, y: windowHeight * 0.2 },     // Start: Right (Enter)
-        p1: { x: windowWidth * 0.5, y: windowHeight * 0.9 },     // Control: Deep Dip (Goes down)
-        p2: { x: -250, y: windowHeight * 0.15 }                  // End: Left (Ascends, Tail visible)
-    };
-
     const saturnX = quadraticBezier(saturnPath.p0.x, saturnPath.p1.x, saturnPath.p2.x, saturnProgress);
     const saturnY = quadraticBezier(saturnPath.p0.y, saturnPath.p1.y, saturnPath.p2.y, saturnProgress);
 
@@ -148,7 +153,7 @@ function updateCinematicPhysics() {
 
     saturnEl.style.opacity = (saturnFade * 0.45).toFixed(2);
     // Removed dynamic blur
-    saturnEl.style.transform = `translate3d(${saturnX.toFixed(1)}px, ${saturnY.toFixed(1)}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale.toFixed(2)})`;
+    saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale.toFixed(2)})`;
     
     if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
@@ -159,7 +164,6 @@ function updateCinematicPhysics() {
 
 // ========== MOBILE MENU TOGGLE ==========
 document.addEventListener("DOMContentLoaded", () => {
-    // Initialize physics immediately
     updateCinematicPhysics();
 
     const toggle = document.querySelector(".menu-toggle");
