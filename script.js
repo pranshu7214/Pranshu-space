@@ -1,32 +1,32 @@
-// ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.1 ========
-// Premium parallax + planet motion, tuned for smoothness & performance
+// ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.1 (MASTER) ========
+// Premium parallax + planet motion, tuned for maximum smoothness & performance
 
 let currentScrollY = window.scrollY;
 let targetScrollY = window.scrollY;
 let animationFrameId = null;
 
-// Throttle heavy planet math to ~30fps (parallax can feel 60fps due to interpolation)
-const PHYSICS_INTERVAL_MS = 34;
+// Throttle heavy planet math
+const PHYSICS_INTERVAL_MS = 0; // Run at full framerate for maximum smoothness
 let lastPhysicsTime = 0;
 
-// Performance Cache
+// Performance Cache to prevent memory leaks
 const physicsCache = {
     elements: null,
     metrics: null
 };
 
-// Smooth linear interpolation
+// Smooth linear interpolation (Lerp)
 function lerp(start, end, progress) {
     return start + (end - start) * Math.min(Math.max(progress, 0), 1);
 }
 
-// Helper for quadratic bezier curves (for smooth, curved paths)
+// Helper for quadratic bezier curves (for smooth, cinematic paths)
 function quadraticBezier(p0, p1, p2, t) {
     const oneMinusT = 1 - t;
     return oneMinusT * oneMinusT * p0 + 2 * oneMinusT * t * p1 + t * t * p2;
 }
 
-// Track scroll position (passive for better scroll performance)
+// Track scroll position (Passive flag makes native scrolling much faster)
 window.addEventListener("scroll", () => {
     targetScrollY = window.scrollY;
     if (animationFrameId === null) {
@@ -34,11 +34,10 @@ window.addEventListener("scroll", () => {
     }
 }, { passive: true });
 
-// Debounce resize to avoid recalc storms, but invalidate metrics immediately
+// Debounce resize to avoid browser calculation storms
 let resizeTimeout = null;
 window.addEventListener("resize", () => {
-    // Always drop cached metrics right away so next frame uses fresh dimensions
-    physicsCache.metrics = null;
+    physicsCache.metrics = null; // Drop cached metrics immediately
     if (resizeTimeout) clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
         resizeTimeout = null;
@@ -54,38 +53,29 @@ function updateCinematicPhysics(now) {
     const shouldRunHeavyStep = elapsed >= PHYSICS_INTERVAL_MS || lastPhysicsTime === 0;
     if (shouldRunHeavyStep) lastPhysicsTime = now;
 
-    // 1. Initialize Elements Cache (Run once)
+    // 1. Initialize Elements Cache (Runs only once)
     if (!physicsCache.elements) {
         const jupiterEl = document.querySelector(".jupiter");
         const saturnEl = document.querySelector(".saturn");
-        const quoteSection = document.getElementById("quote-section");
-        const librarySection = document.getElementById("library-section");
-        const essayCard = document.querySelector(".earth-theme");
-        const footer = document.querySelector("footer");
+        const quoteSection = document.getElementById("quote-section") || document.querySelector(".page-intro");
+        const librarySection = document.getElementById("library-section") || document.querySelector(".content-grid");
         const spaceBg = document.querySelector(".space-bg");
+        const cards = document.querySelectorAll(".card, .content-card, .solid-glass"); 
 
         if (jupiterEl) jupiterEl.style.opacity = "0.6";
-        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg };
+        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards };
     }
-    const { jupiterEl, saturnEl, quoteSection, librarySection, essayCard, footer, spaceBg } = physicsCache.elements;
+    const { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards } = physicsCache.elements;
 
-    // 2. Initialize Metrics Cache (Run on load & resize)
+    // 2. Initialize Metrics Cache (Runs on load & resize)
     if (!physicsCache.metrics) {
         const windowHeight = window.innerHeight;
         const windowWidth = window.innerWidth;
 
-        const quoteTop = quoteSection ? quoteSection.offsetTop : 0;
-        const quoteHeight = quoteSection ? quoteSection.offsetHeight : 0;
-        
-        const libraryTop = librarySection ? librarySection.offsetTop : 0;
-        const essayCardTop = essayCard ? essayCard.offsetTop : 0;
-        const essayCardHeight = essayCard ? essayCard.offsetHeight : 200;
-        const essayCardCenter = essayCardTop + essayCardHeight / 2;
-        
-        const footerTop = footer ? footer.offsetTop : document.body.offsetHeight;
+        const quoteTop = quoteSection ? quoteSection.offsetTop : windowHeight * 1.2;
         const maxScroll = Math.max(document.documentElement.scrollHeight - windowHeight, 1);
         
-        // Pre-calculate paths to avoid object creation every frame
+        // Pre-calculate celestial paths to avoid heavy math every single frame
         const jupiterPath = {
             p0: { x: -200, y: windowHeight * 0.1 },
             p1: { x: windowWidth * 0.4, y: windowHeight * 1.0 },
@@ -98,30 +88,43 @@ function updateCinematicPhysics(now) {
             p2: { x: -250, y: windowHeight * 0.15 }
         };
 
-        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll, jupiterPath, saturnPath };
+        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath };
     }
-    const { windowHeight, windowWidth, quoteTop, quoteHeight, libraryTop, essayCardCenter, footerTop, maxScroll, jupiterPath, saturnPath } = physicsCache.metrics;
+    const { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath } = physicsCache.metrics;
     
-    // MOBILE OPTIMIZATION: Stop ALL physics calculations on mobile to prevent lag
+    // MOBILE OPTIMIZATION: Stop ALL heavy physics calculations on mobile to prevent lag
     if (windowWidth < 900) {
-        // Disable parallax on mobile - it causes scroll lag
-        if (spaceBg) spaceBg.style.transform = 'none';
         animationFrameId = null;
         return;
     }
 
-    // Smooth out the scroll value (Linear Interpolation)
-    // Slightly higher interpolation factor = a bit more responsive but still smooth
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.16);
+    // Interpolate scroll value
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.08);
 
-    // Light but noticeable parallax across all pages (desktop only)
-    const parallaxY = currentScrollY * 0.08;
-    if (spaceBg) spaceBg.style.transform = `translate3d(0, -${parallaxY.toFixed(1)}px, 0)`;
+    // ========== BACKGROUND PARALLAX ==========
+    if (spaceBg) {
+        spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(2)}px, 0)`;
+    }
 
-    // If we are on a subpage (no planets), just keep the loop running for parallax and exit
-    if (!jupiterEl || !saturnEl || !quoteSection) {
-        if (Math.abs(targetScrollY - currentScrollY) > 0.5) animationFrameId = requestAnimationFrame(updateCinematicPhysics);
-        else animationFrameId = null;
+    // ========== CARDS: VERTICAL PARALLAX ==========
+    if (cards) {
+        cards.forEach((card, index) => {
+            if (!card.matches(':hover')) {
+                // Staggered movement based on index creates incredible 3D depth
+                const cardParallax = (currentScrollY * 0.02) + (index % 2 * 5);
+                card.style.transform = `translate3d(0, -${cardParallax.toFixed(2)}px, 0)`;
+                card.dataset.currentParallax = -cardParallax; // Store for tilt handoff
+            }
+        });
+    }
+
+    // If on a subpage without planets, continue parallax loop then exit safely
+    if (!jupiterEl || !saturnEl) {
+        if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
+            animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+        } else {
+            animationFrameId = null;
+        }
         return;
     }
 
@@ -134,30 +137,17 @@ function updateCinematicPhysics(now) {
         return;
     }
 
-    // If we're in a frame where we only want parallax smoothing, skip heavy math
-    if (!shouldRunHeavyStep) {
-        if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
-            animationFrameId = requestAnimationFrame(updateCinematicPhysics);
-        } else {
-            animationFrameId = null;
-        }
-        return;
-    }
-
-    // ========== JUPITER: SLINGSHOT EXIT (LEFT -> DOWN -> UP-RIGHT) ==========
-    // Active from Start -> Quote Section. Exits exactly as Saturn enters.
+    // ========== JUPITER: SLINGSHOT EXIT ==========
     const jupiterZoneEnd = quoteTop;
     const jupiterProgress = Math.min(Math.max(currentScrollY / jupiterZoneEnd, 0), 1);
     
     const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
     const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
 
-    // Removed repetitive filter assignment
     jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterProgress * 45}deg)`;
 
-    // ========== SATURN: CURVED PATH (RIGHT -> DIP -> LEFT & UP) ==========
-    // Starts at Quote, dips behind cards, moves Left & Upwards
-    const saturnZoneStart = quoteTop; // Animation starts when quote section is at the top
+    // ========== SATURN: CURVED PATH ==========
+    const saturnZoneStart = quoteTop; 
     const saturnZoneEnd = maxScroll;
     const saturnZoneHeight = Math.max(saturnZoneEnd - saturnZoneStart, 1);
 
@@ -169,16 +159,13 @@ function updateCinematicPhysics(now) {
     const saturnX = quadraticBezier(saturnPath.p0.x, saturnPath.p1.x, saturnPath.p2.x, saturnProgress);
     const saturnY = quadraticBezier(saturnPath.p0.y, saturnPath.p1.y, saturnPath.p2.y, saturnProgress);
 
-    // Fade in Saturn as it enters the zone
-    const saturnFade = Math.min(saturnProgress * 4, 1); // Quick fade in
-
-    // Extra: Scale effect to simulate 3D depth (larger when lower/closer)
+    const saturnFade = Math.min(saturnProgress * 4, 1); 
     const saturnScale = 0.9 + 0.3 * Math.sin(saturnProgress * Math.PI);
 
     saturnEl.style.opacity = (saturnFade * 0.45).toFixed(2);
-    // Removed dynamic blur
     saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale.toFixed(2)})`;
     
+    // Engine Loop
     if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     } else {
@@ -186,33 +173,74 @@ function updateCinematicPhysics(now) {
     }
 }
 
-// ========== MOBILE MENU TOGGLE ==========
+// ======== 3D CARD TILT EFFECT ========
+function initCardTilt() {
+    if (window.matchMedia("(hover: none)").matches) return; // Ignore on touch
+
+    const cards = document.querySelectorAll(".card, .content-card, .solid-glass");
+    cards.forEach(card => {
+        let rect;
+
+        card.addEventListener("mouseenter", () => {
+            rect = card.getBoundingClientRect();
+            card.style.transition = "transform 0.1s ease-out, box-shadow 0.7s, border-color 0.7s";
+        });
+
+        card.addEventListener("mousemove", (e) => {
+            if (!rect) rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((y - centerY) / centerY) * -5; 
+            const rotateY = ((x - centerX) / centerX) * 5;
+
+            // Integrates with parallax floating effect
+            const currentParallax = parseFloat(card.dataset.currentParallax || 0);
+            card.style.transform = `perspective(1000px) translate3d(0, ${currentParallax}px, 0) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.02)`;
+        });
+
+        card.addEventListener("mouseleave", () => {
+            card.style.transition = "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+            const currentParallax = parseFloat(card.dataset.currentParallax || 0);
+            card.style.transform = `translate3d(0, ${currentParallax}px, 0)`;
+        });
+    });
+}
+
+// ========== GLOBAL INITIALIZATION & MOBILE MENU ==========
 document.addEventListener("DOMContentLoaded", () => {
     lastPhysicsTime = 0;
     updateCinematicPhysics(performance.now());
+    initCardTilt(); 
 
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
 
     if (toggle && mobileMenu) {
         toggle.addEventListener("click", (e) => {
-            e.stopPropagation(); // Prevent click from bubbling to document
+            e.stopPropagation(); 
             const isFlex = mobileMenu.style.display === "flex";
             mobileMenu.style.display = isFlex ? "none" : "flex";
         });
 
-        // Close menu when clicking outside (on the homepage content)
         document.addEventListener("click", (e) => {
             if (mobileMenu.style.display === "flex" && !mobileMenu.contains(e.target)) {
                 mobileMenu.style.display = "none";
             }
         });
 
-        // Close menu when clicking a link inside the menu
         mobileMenu.querySelectorAll("a").forEach(link => {
             link.addEventListener("click", () => {
                 mobileMenu.style.display = "none";
             });
         });
     }
+});
+
+// ========== CONTENT PROTECTION ==========
+// Deters casual highlight-and-copy behavior
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
 });

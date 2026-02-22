@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fiction | Pranshu’s Library</title>
+  <title>Fiction | The Reading Room</title>
   <meta name="description" content="Short stories and narrative fiction by Pranshu. Dive into immersive worlds, thrillers like 'The Rehearsed Lie', and tales from the deep." />
   <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
@@ -37,7 +37,7 @@
 
     <div class="nav-logo">
       <a href="index.html">
-        <img src="images/final logo.png" alt="Pranshu's Library Logo">
+        <img src="images/final logo.png" alt="The Reading Room Logo">
       </a>
     </div>
 
@@ -60,11 +60,29 @@
       <a href="about.html">About</a>
   </div>
 
-  <main style="padding-top: 160px; min-height: 100vh; display: flex; flex-direction: column;">
-    <section style="flex: 1; text-align: center; padding: 0 2rem;">
-      <h1 style="font-size: 3rem; margin-bottom: 2rem;">Fiction</h1>
-      <p style="font-size: 1.2rem; color: #ccc;">Short stories and fictional works.</p>
-    </section>
+  <main class="reading-container">
+    
+    <article class="reading-main solid-glass">
+      <span class="item-meta">Fiction • Commonwealth Short Story</span>
+      <h1>The Rehearsed Lie</h1>
+      
+      <div class="reading-text">
+        <p>You signed off on the body count. Math won’t wash off blood. Don't hide behind patriotism now...</p>
+        <p>Put paragraph two here. Notice how the text is large, the line height is breathable, and the dark background makes the white text pop without hurting the eyes.</p>
+        <p>Because we used the solid-glass class, there is zero scroll lag, even if this story is 5,000 words long.</p>
+      </div>
+    </article>
+
+    <aside class="reading-sidebar solid-glass">
+      <h3 class="sidebar-title">More Fiction</h3>
+      <ul class="sidebar-list">
+        <li><a href="#" class="active-link">The Rehearsed Lie</a></li>
+        <li><a href="#">The Architect's Flaw</a></li>
+        <li><a href="#">Midnight at the Terminal</a></li>
+      </ul>
+    </aside>
+
+  </main>
 
     <footer>
       <p>© 2026 Pranshu. All rights reserved.</p>
@@ -74,7 +92,6 @@
         <a href="mailto:pranshu.writes@gmail.com" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-envelope"></i></a>
       </div>
     </footer>
-  </main>
 
   <script src="script.js"></script>
 </body>
