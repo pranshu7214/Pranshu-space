@@ -62,7 +62,7 @@ function updateCinematicPhysics(now) {
         const spaceBg = document.querySelector(".space-bg");
         const cards = document.querySelectorAll(".card, .content-card, .solid-glass"); 
 
-        if (jupiterEl) jupiterEl.style.opacity = "0.6";
+        if (jupiterEl) jupiterEl.style.opacity = "0.4";
         physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards };
     }
     const { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards } = physicsCache.elements;
@@ -144,7 +144,9 @@ function updateCinematicPhysics(now) {
     const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
     const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
 
-    jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterProgress * 45}deg)`;
+    const jupiterRotation = (now * 0.005) % 360;
+    const jupiterScale = 0.9 + 0.25 * Math.sin(jupiterProgress * Math.PI); // Restricted zoom
+    jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterRotation.toFixed(2)}deg) scale(${jupiterScale.toFixed(2)})`;
 
     // ========== SATURN: CURVED PATH ==========
     const saturnZoneStart = quoteTop; 
@@ -160,17 +162,14 @@ function updateCinematicPhysics(now) {
     const saturnY = quadraticBezier(saturnPath.p0.y, saturnPath.p1.y, saturnPath.p2.y, saturnProgress);
 
     const saturnFade = Math.min(saturnProgress * 4, 1); 
-    const saturnScale = 0.9 + 0.3 * Math.sin(saturnProgress * Math.PI);
+    const saturnRotation = -(now * 0.005) % 360; // Rotate opposite direction
+    const saturnScale = 0.9 + 0.25 * Math.sin(saturnProgress * Math.PI); // Zoom in/out effect
 
-    saturnEl.style.opacity = (saturnFade * 0.45).toFixed(2);
-    saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnProgress * -30}deg) scale(${saturnScale.toFixed(2)})`;
+    saturnEl.style.opacity = (saturnFade * 0.4).toFixed(2); // Match Jupiter opacity
+    saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnRotation.toFixed(2)}deg) scale(${saturnScale.toFixed(2)})`;
     
     // Engine Loop
-    if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
-        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
-    } else {
-        animationFrameId = null;
-    }
+    animationFrameId = requestAnimationFrame(updateCinematicPhysics);
 }
 
 // ======== 3D CARD TILT EFFECT ========
@@ -180,29 +179,44 @@ function initCardTilt() {
     const cards = document.querySelectorAll(".card, .content-card, .solid-glass");
     cards.forEach(card => {
         let rect;
+        let ticking = false; // Throttling flag for performance
 
         card.addEventListener("mouseenter", () => {
             rect = card.getBoundingClientRect();
-            card.style.transition = "transform 0.1s ease-out, box-shadow 0.7s, border-color 0.7s";
+            card.style.transition = "transform 0.1s ease-out, height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
         });
 
         card.addEventListener("mousemove", (e) => {
-            if (!rect) rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = ((y - centerY) / centerY) * -5; 
-            const rotateY = ((x - centerX) / centerX) * 5;
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    // Always update rect to handle scrolling while hovering
+                    rect = card.getBoundingClientRect();
+                    
+                    // Calculate relative position for Glow & Tilt
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    // Update CSS variables for the Glow Effect
+                    card.style.setProperty("--mouse-x", `${x}px`);
+                    card.style.setProperty("--mouse-y", `${y}px`);
 
-            // Integrates with parallax floating effect
-            const currentParallax = parseFloat(card.dataset.currentParallax || 0);
-            card.style.transform = `perspective(1000px) translate3d(0, ${currentParallax}px, 0) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.02)`;
+                    // Tilt Logic
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -5; 
+                    const rotateY = ((x - centerX) / centerX) * 5;
+
+                    const currentParallax = parseFloat(card.dataset.currentParallax || 0);
+                    card.style.transform = `perspective(1000px) translate3d(0, ${currentParallax}px, 0) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.02)`;
+                    
+                    ticking = false;
+                });
+                ticking = true;
+            }
         });
 
         card.addEventListener("mouseleave", () => {
-            card.style.transition = "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+            card.style.transition = "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax}px, 0)`;
         });
