@@ -21,14 +21,24 @@ body {
   background: #000;
   color: var(--text-color);
   overflow-x: hidden;
+  /* Fix for sticky footer on short pages */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* --- VISUAL POLISH --- */
+::selection {
+  background: rgba(255, 215, 0, 0.3); /* Gold selection background */
+  color: #fff;
 }
 
 /* --- BACKGROUNDS --- */
 .space-bg {
   position: fixed;
-  top: -10vh; left: 0;
-  width: 100%; height: 120vh;
-  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("images/universe.jpg") center/cover no-repeat;
+  top: -10%; left: 0;
+  width: 100%; height: 120%; /* Taller to allow parallax movement */
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("images/universe.webp") center/cover no-repeat;
   z-index: -5;
   will-change: transform;
   transform: translateZ(0);
@@ -39,19 +49,19 @@ body {
 /* Page Specific Backgrounds */
 .space-bg.bg-poems {
   background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
-              url("images/bg-poems.jpg");
+              url("images/bg-poems.webp");
 }
 .space-bg.bg-essays {
   background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
-              url("images/bg-essays.jpg");
+              url("images/bg-essays.webp");
 }
 .space-bg.bg-fiction {
   background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
-              url("images/bg-fiction.jpg");
+              url("images/bg-fiction.webp");
 }
 .space-bg.bg-about {
   background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
-              url("images/bg-about.jpg");
+              url("images/bg-about.webp");
 }
 
 /* PLANETS: Fixed by default, JS controls position */
@@ -67,7 +77,6 @@ body {
   transform: translateZ(0); /* Force hardware acceleration */
   backface-visibility: hidden;
   contain: layout paint;
-  transition: transform 0.18s ease-out;
 }
 
 /* Initial States */
@@ -163,6 +172,8 @@ body {
   display: flex; flex-direction: column;
   justify-content: center; align-items: center;
   text-align: center; padding-top: 140px;
+  position: relative;
+  z-index: 2; /* Ensure title sits above planets */
 }
 
 .hero h1 {
@@ -239,7 +250,10 @@ body {
   display: flex; align-items: center; justify-content: center;
   text-decoration: none; 
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth easing */
+  /* Transition specific properties to allow JS to control transform instantly */
+  transition: height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              box-shadow 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              border-color 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   border: 1px solid rgba(255,255,255,0.1);
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -319,6 +333,7 @@ footer {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid rgba(255,255,255,0.1); 
+    margin-top: auto; /* Pushes footer to bottom */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -432,6 +447,9 @@ footer {
 /* --- MOBILE BACKGROUND FIX --- */
 @media (max-width: 768px) {
     .space-bg {
+        /* Mobile optimized background */
+        background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("images/universe-mobile.webp");
+
         /* Center it so you see the core of the galaxy */
         background-position: center center !important;
         
@@ -441,4 +459,199 @@ footer {
         /* Prevents the "tearing" lag when scrolling */
         background-attachment: scroll !important;
     }
+}
+
+/* =========================================
+   THE READING ROOM - CONTENT LAYOUTS
+   ========================================= */
+
+/* 1. Page Intro Quote */
+.page-intro {
+    padding: 160px 2rem 4rem;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+}
+
+.page-intro p {
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    font-style: italic;
+    color: #e0e0e0;
+    line-height: 1.6;
+    letter-spacing: 0.05em;
+}
+
+/* 2. Content Grid (The Shelves) */
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 0 5vw 6rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+}
+
+/* 3. The "Solid Glass" Panel */
+.solid-glass, a.solid-glass {
+    background: rgba(10, 15, 20, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-decoration: none !important;
+    color: #fff !important;
+    display: flex;
+    flex-direction: column;
+}
+
+a.solid-glass:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.item-meta {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.item-title {
+    font-size: 1.8rem;
+    color: #fff;
+    margin-bottom: 1rem;
+    font-weight: 400;
+}
+
+.item-excerpt {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #ccc;
+    font-style: italic;
+}
+
+/* 4. Individual Reading Page */
+.reading-container {
+    display: flex;
+    gap: 3rem;
+    padding: 200px 5vw 6rem !important; /* Pushes content below the 105px ribbon */
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 5;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.reading-main {
+    flex: 1;
+    padding: 3rem 4rem;
+}
+
+.reading-main h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+}
+
+.reading-text {
+    margin-top: 3rem;
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: #e0e0e0;
+}
+
+.reading-text p {
+    margin-bottom: 2rem;
+}
+
+/* Drop Cap for the first letter of the story */
+.reading-text p:first-of-type::first-letter {
+    font-size: 3.5em;
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.5rem;
+    color: #FFD700;
+}
+
+/* Disable selection for copy protection */
+.reading-text, .page-intro p, .post-content, .quote-text {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* 5. The Sidebar Index */
+.reading-sidebar {
+    width: 320px;
+    position: sticky;
+    top: 140px;
+}
+
+.sidebar-title {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 0.5rem;
+}
+
+.sidebar-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sidebar-list a {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+
+.sidebar-list a:hover, .sidebar-list a.active-link {
+    color: #FFD700;
+}
+
+/* --- Page Load Animation --- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.reading-main, .reading-sidebar, .content-grid, .page-intro {
+    animation: fadeInUp 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0; 
+}
+
+/* --- Mobile Adjustments for Reading Room --- */
+@media (max-width: 900px) {
+    .reading-container {
+        flex-direction: column;
+        padding-top: 100px !important; 
+    }
+    .reading-sidebar {
+        width: 100%;
+        position: static; 
+        margin-top: 3rem;
+    }
+    .reading-main {
+        padding: 2rem;
+    }
+}
+
+/* --- POEMS PAGE CLEANUP --- */
+/* Add class="poems-page" to the body of poems.html to activate this */
+.poems-page .item-excerpt,
+.poems-page .item-meta {
+    display: none !important;
 }
