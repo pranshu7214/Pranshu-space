@@ -112,9 +112,7 @@ body {
   position: fixed;
   top: 0; width: 100%; 
   height: 105px; /* Bigger ribbon */
-  background: var(--ribbon-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(10, 15, 20, 0.95);
   border-bottom: 1px solid rgba(255,255,255,0.1);
   display: flex;
   justify-content: space-between; /* Spread left, center, right */
@@ -245,7 +243,7 @@ body {
     font-style: italic; 
     line-height: 1.8; 
     color: #f0f0f0; /* More White */
-    animation: quoteGlow 4s ease-in-out infinite;
+    /* animation: quoteGlow 4s ease-in-out infinite; -- Disabled for performance */
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
     letter-spacing: 0.05em;
 }
@@ -279,6 +277,7 @@ body {
   border: 1px solid rgba(255,255,255,0.1);
   transform: translateZ(0);
   backface-visibility: hidden;
+  will-change: transform;
 }
 
 /* Theme Borders & Colors */
@@ -351,9 +350,7 @@ body {
 footer { 
     position: relative; z-index: 60; /* Above planets */
     text-align: center; padding: 1rem 2rem; 
-    background: rgba(5, 5, 5, 0.4);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(10, 15, 20, 0.95);
     border-top: 1px solid rgba(255,255,255,0.1); 
     margin-top: auto; /* Pushes footer to bottom */
     display: flex;
@@ -366,6 +363,9 @@ footer {
     color: #fff; font-size: 1.4rem; margin: 0 1rem; opacity: 0.5; transition: 0.3s; 
 }
 .footer-icons a:hover { color: #FFD700; opacity: 1; }
+
+/* Global Mobile Menu Hide (Fix for Desktop) */
+.mobile-nav-overlay { display: none; }
 
 /* --- MOBILE OPTIMIZATION --- */
 @media (max-width: 900px) {
@@ -498,28 +498,38 @@ footer {
     z-index: 5;
 }
 
+.quote-glass {
+    background: rgba(10, 15, 20, 0.6);
+    padding: 2.5rem 3rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin: 0 auto;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Mobile adjustment for quote box */
+@media (max-width: 600px) {
+    .quote-glass { padding: 2rem 1.5rem; }
+}
+
+.page-title {
+    font-size: 1.8rem;
+    color: #FFD700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 1rem;
+}
+
 .page-intro p {
-    font-size: clamp(1rem, 1.5vw, 1.35rem);
+    font-size: clamp(0.9rem, 1.2vw, 1.1rem);
     font-style: italic;
     color: #f0f0f0;
     line-height: 1.6;
     letter-spacing: 0.05em;
-    background: rgba(0, 0, 0, 0.6); /* Darker for better text visibility */
-    padding: 2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    margin: 0 auto;
-    display: inline-block;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Deep shadow for pop */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8); /* Text shadow for readability */
-    transition: transform 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
-}
-
-.page-intro p:hover {
-    transform: scale(1.02); /* Subtle zoom on hover */
-    background: rgba(0, 0, 0, 0.75);
-    border-color: rgba(255, 215, 0, 0.3); /* Gold hint */
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
 }
 
 /* 2. Content Grid (The Shelves) */
@@ -541,8 +551,14 @@ footer {
     background: rgba(10, 15, 20, 0.6) !important; /* More transparent to blend */
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    padding: 2rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 1rem 1.5rem;
+    /* UPDATED: Thinner cards with hover reveal */
+    height: 100px;
+    justify-content: center;
+    transition: height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                transform 0.3s ease, 
+                box-shadow 0.3s ease,
+                background 0.3s ease;
     text-decoration: none !important;
     color: #fff !important;
     display: flex;
@@ -550,6 +566,8 @@ footer {
 }
 
 a.solid-glass:hover {
+    height: 220px; /* Expand to show content */
+    background: rgba(10, 15, 20, 0.9) !important;
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     border-color: rgba(255, 255, 255, 0.15);
@@ -563,6 +581,22 @@ a.solid-glass:hover {
 .solid-glass.earth-theme:hover { box-shadow: 0 0 30px var(--color-earth); border-color: var(--color-earth); }
 .solid-glass.fire-theme:hover { box-shadow: 0 0 30px var(--color-fire); border-color: var(--color-fire); }
 .solid-glass.water-theme:hover { box-shadow: 0 0 30px var(--color-water); border-color: var(--color-water); }
+
+/* Hide Meta and Excerpt initially */
+.solid-glass .item-excerpt {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Show on Hover */
+.solid-glass:hover .item-excerpt {
+    opacity: 1;
+    max-height: 200px;
+    margin-bottom: 1rem;
+}
 
 /* --- MOUSE FOLLOW GLOW EFFECT --- */
 .card::after, .solid-glass::after {
@@ -595,14 +629,14 @@ a.solid-glass:hover {
 }
 
 .item-title {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: #fff;
     margin-bottom: 1rem;
     font-weight: 400;
 }
 
 .item-excerpt {
-    font-size: 1.1rem;
+    font-size: 1rem;
     line-height: 1.6;
     color: #ccc;
     font-style: italic;
@@ -719,11 +753,4 @@ a.solid-glass:hover {
     .reading-main {
         padding: 2rem;
     }
-}
-
-/* --- POEMS PAGE CLEANUP --- */
-/* Add class="poems-page" to the body of poems.html to activate this */
-.poems-page .item-excerpt,
-.poems-page .item-meta {
-    display: none !important;
 }

@@ -189,8 +189,8 @@ function initCardTilt() {
         card.addEventListener("mousemove", (e) => {
             if (!ticking) {
                 window.requestAnimationFrame(() => {
-                    // Always update rect to handle scrolling while hovering
-                    rect = card.getBoundingClientRect();
+                    // Optimization: Use cached rect from mouseenter to avoid layout thrashing
+                    if (!rect) rect = card.getBoundingClientRect();
                     
                     // Calculate relative position for Glow & Tilt
                     const x = e.clientX - rect.left;
