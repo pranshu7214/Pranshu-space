@@ -30,6 +30,7 @@ function quadraticBezier(p0, p1, p2, t) {
 // Track scroll position (Passive flag makes native scrolling much faster)
 window.addEventListener("scroll", () => {
     targetScrollY = window.scrollY;
+    updateReadingProgress();
     if (animationFrameId === null) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
@@ -97,9 +98,23 @@ function updateCinematicPhysics(now) {
             p2: { x: -250, y: windowHeight * 0.15 }
         };
 
-        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath };
-    }
-    const { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath } = physicsCache.metrics;
+// Pre-calculate card positions for visibility check (Optimization)
+        const cardMetrics = [];
+        if (cards) {
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                cardMetrics.push({
+                    el: card,
+                    top: rect.top + scrollTop,
+                    height: rect.height
+                });
+            });
+        }
+
+        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics };
+        }
+    const { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics } = physicsCache.metrics;
     
     // MOBILE OPTIMIZATION: Stop ALL heavy physics calculations on mobile to prevent lag
     if (windowWidth < 900) {
@@ -119,13 +134,21 @@ function updateCinematicPhysics(now) {
     }
 
     // ========== CARDS: VERTICAL PARALLAX ==========
-    if (cards && isScrolling) {
-        cards.forEach((card, index) => {
-            if (!card.isHovered) {
-                // Staggered movement based on index creates incredible 3D depth
-                const cardParallax = (currentScrollY * 0.02) + (index % 2 * 5);
-                card.style.transform = `translate3d(0, -${cardParallax.toFixed(2)}px, 0)`;
-                card.dataset.currentParallax = -cardParallax; // Store for tilt handoff
+    if (cardMetrics && isScrolling) {
+        const viewTop = currentScrollY;
+        const viewBottom = currentScrollY + windowHeight;
+        const buffer = 200; // Render slightly outside viewport
+
+        cardMetrics.forEach((metric, index) => {
+            // Only animate if visible in viewport
+            if (metric.top < viewBottom + buffer && metric.top + metric.height > viewTop - buffer) {
+                const card = metric.el;
+                if (!card.isHovered) {
+                    // Staggered movement based on index creates incredible 3D depth
+                    const cardParallax = (currentScrollY * 0.02) + (index % 2 * 5);
+                    card.style.transform = `translate3d(0, -${cardParallax.toFixed(2)}px, 0)`;
+                    card.dataset.currentParallax = -cardParallax; // Store for tilt handoff
+                }
             }
         });
     }
@@ -267,3 +290,23 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
 });
+
+// ======== READING PROGRESS ========
+function updateReadingProgress() {
+    const progressBar = document.getElementById('reading-progress');
+    if (progressBar) {
+        let maxScroll;
+        // Optimization: Use cached metrics if available to avoid layout thrashing
+        if (physicsCache.metrics && physicsCache.metrics.maxScroll) {
+            maxScroll = physicsCache.metrics.maxScroll;
+        } else {
+            maxScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        }
+
+        if (maxScroll > 0) {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollPercent = (scrollTop / maxScroll) * 100;
+            progressBar.style.width = `${scrollPercent}%`;
+        }
+    }
+}
