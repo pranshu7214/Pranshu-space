@@ -9,12 +9,9 @@
   --color-water: #64B5F6; /* Softer Water Blue */
 }
 
-/* Smooth scroll only on desktop - causes lag on mobile */
-@media (min-width: 901px) {
-  html { scroll-behavior: smooth; }
-}
+html { scroll-behavior: smooth; }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
 body {
   font-family: var(--font-main);
@@ -57,8 +54,7 @@ body {
   z-index: -10; /* Pushed further back */
   will-change: transform;
   transform: translateZ(0);
-  backface-visibility: hidden;
-  /* No filter here - improves scroll/parallax performance */
+  backface-visibility: hidden; /* Improves scroll/parallax performance */
 }
 
 /* Page Specific Backgrounds */
@@ -111,14 +107,14 @@ body {
 .ribbon {
   position: fixed;
   top: 0; width: 100%; 
-  height: 105px; /* Bigger ribbon */
+  height: 90px; /* Slightly bigger ribbon */
   background: rgba(10, 15, 20, 0.95);
   border-bottom: 1px solid rgba(255,255,255,0.1);
   display: flex;
   justify-content: space-between; /* Spread left, center, right */
   align-items: center;
   z-index: 1000;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+  box-shadow: 0 5px 20px rgba(0,0,0,0.8); /* Reduced shadow for performance */
   padding: 0 3rem;
 }
 
@@ -141,8 +137,8 @@ body {
 }
 
 .nav-logo img {
-  height: 160px; /* Much bigger than ribbon (120px) */
-  margin-top: 50px; /* Pushes it down to spill over */
+  height: 115px; /* Slightly larger */
+  margin-top: 25px; /* Adjusted spill */
   filter: drop-shadow(0 10px 20px rgba(0,0,0,0.7));
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
@@ -179,6 +175,11 @@ body {
 /* Mobile Toggle - Hidden on Desktop */
 .menu-toggle, .mobile-home-icon { display: none; }
 
+.mobile-home-icon.active {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
 /* --- HERO --- */
 .hero {
   height: 100vh;
@@ -211,8 +212,8 @@ body {
   animation: spinForever 25s infinite linear, floatHero 6s ease-in-out infinite; 
   will-change: transform, translate; 
 }
-@keyframes spinForever { 
-  from { transform: rotate(0deg); } 
+
+@keyframes spinForever {
   to { transform: rotate(360deg); } 
 }
 
@@ -221,6 +222,7 @@ body {
   .spinning-logo {
     animation: none !important;
     will-change: auto !important;
+    width: 140px; /* Smaller logo under title on mobile */
   }
 }
 
@@ -243,7 +245,7 @@ body {
     font-style: italic; 
     line-height: 1.8; 
     color: #f0f0f0; /* More White */
-    /* animation: quoteGlow 4s ease-in-out infinite; -- Disabled for performance */
+    animation: quoteGlow 4s ease-in-out infinite;
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
     letter-spacing: 0.05em;
 }
@@ -253,6 +255,11 @@ body {
   .quote-text {
     animation: none !important;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.3) !important;
+    font-size: 1.1rem !important; /* Smaller quote on mobile */
+  }
+  .hero h1 { 
+    animation: none !important; 
+    font-size: 2.2rem !important; /* Smaller title on mobile */
   }
 }
 .highlight { color: #fff; font-weight: 600; text-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
@@ -269,7 +276,7 @@ body {
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   text-decoration: none; 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.5); /* Reduced shadow */
   /* Transition specific properties to allow JS to control transform instantly */
   transition: height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
               box-shadow 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
@@ -321,7 +328,7 @@ body {
 /* --- HOVER EFFECTS (Desktop) --- */
 @media (hover: hover) {
     .card:hover {
-        height: 240px; /* Expands slightly */
+        height: 240px; /* Expands to show quote */
         will-change: transform, opacity;
     }
     
@@ -349,23 +356,20 @@ body {
 /* --- FOOTER --- */
 footer { 
     position: relative; z-index: 60; /* Above planets */
-    text-align: center; padding: 1rem 2rem; 
+    text-align: center; padding: 0.5rem 2rem; 
     background: rgba(10, 15, 20, 0.95);
     border-top: 1px solid rgba(255,255,255,0.1); 
     margin-top: auto; /* Pushes footer to bottom */
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
 .footer-icons a { 
     color: #fff; font-size: 1.4rem; margin: 0 1rem; opacity: 0.5; transition: 0.3s; 
 }
 .footer-icons a:hover { color: #FFD700; opacity: 1; }
-
-/* Global Mobile Menu Hide (Fix for Desktop) */
-.mobile-nav-overlay { display: none; }
 
 /* --- MOBILE OPTIMIZATION --- */
 @media (max-width: 900px) {
@@ -382,10 +386,10 @@ footer {
   }
 
   /* PERFORMANCE PATCH: Disable heavy effects on mobile */
-  .ribbon, .card, .mobile-nav-overlay, footer {
+  .ribbon, .mobile-nav-overlay, footer {
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
-      background: rgba(10, 10, 15, 0.95) !important;
+      background: rgba(10, 15, 20, 0.95) !important; /* Less transparent */
   }
   
   .card, .ribbon, .nav-logo img {
@@ -399,10 +403,11 @@ footer {
     transition: color 0.3s; }
 
   /* Ribbon Changes */
-  .ribbon { justify-content: space-between; padding: 0 2rem; height: 75px; }
+  .ribbon { justify-content: space-between; padding: 0 2rem; height: 60px; }
   .desktop-only { display: none; }
-  .menu-toggle { display: block; font-size: 1.8rem; color: #fff; cursor: pointer; }
-  .mobile-home-icon { display: block; font-size: 1.5rem; color: #fff; text-decoration: none; }
+  .menu-toggle { display: block; font-size: 1.1rem; color: #fff; cursor: pointer; }
+  .mobile-home-icon { display: block; font-size: 0.95rem; color: #fff; text-decoration: none; }
+  .mobile-home-icon.active { color: #FFD700 !important; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6) !important; }
 
   /* Center Logo on Mobile */
   .nav-logo {
@@ -413,37 +418,77 @@ footer {
 
   /* Adjust Logo for Mobile Ribbon */
   .nav-logo img { 
-      height: 70px; margin-top: 0; 
+      height: 75px; margin-top: 12px; /* Slightly larger mobile logo */
       filter: none; transform: none; 
   }
 
   /* Mobile Menu Overlay */
   .mobile-nav-overlay {
       display: none; /* JS toggles flex */
-      position: fixed; top: 75px; left: 0; width: 100%;
+      position: fixed; top: 60px; left: 0; width: 100%;
       background: rgba(0,0,0,0.95);
-      flex-direction: column; padding: 2rem; gap: 2rem;
+      flex-direction: column; padding: 1rem; gap: 0.8rem;
       border-bottom: 1px solid #333;
       z-index: 2000;
   }
   .mobile-nav-overlay a {
-      color: #fff; font-size: 1.5rem; text-decoration: none; text-transform: uppercase;
+      color: #fff; font-size: 0.9rem; text-decoration: none; text-transform: uppercase;
+      transition: color 0.3s, text-shadow 0.3s;
   }
+  .mobile-nav-overlay a.active { color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
   
   /* Mobile Cards - Static View */
   .card { 
-      width: 95vw; height: auto; min-height: 160px; 
-      flex-direction: column; padding: 2rem 1rem;
-      background: rgba(255,255,255,0.05); /* Static light bg */
+      width: 80vw; height: auto; min-height: 80px; 
+      flex-direction: column; padding: 0.4rem;
+      background: rgba(10, 15, 20, 0.4) !important; /* Transparent like desktop */
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
   }
   
-  .card-title { font-size: 2rem; opacity: 1; margin-bottom: 0.5rem; }
+  .card-title { font-size: 1.1rem; opacity: 1; margin-bottom: 0.2rem; }
   
   /* Show Quote Statically but small */
   .card-quote { 
-      height: auto; opacity: 0.7; font-size: 0.9rem; display: block; 
+      height: auto; opacity: 0.7; font-size: 0.85rem; display: block; 
   }
-  .card-quote p { margin-top: 0.5rem; font-size: 1rem; }
+  .card-quote p { margin-top: 0.3rem; font-size: 0.9rem; }
+
+  /* Subpage Constraints - Prevent touching edges */
+  .content-featured, .content-archive, .page-intro {
+      width: 88vw;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 0;
+      padding-right: 0;
+  }
+  .page-intro { padding-top: 160px; }
+
+  /* Smaller Subpage Cards */
+  .card-anchor {
+      min-height: 50px;
+      padding: 0.5rem !important;
+  }
+  .card-anchor .item-title { font-size: 1.1rem; }
+  .item-meta { font-size: 0.75rem; }
+
+  /* Remove hover effects on mobile */
+  .card-anchor:hover .item-excerpt {
+      max-height: 0 !important;
+      opacity: 0 !important;
+      margin-top: 0 !important;
+  }
+  a.solid-glass:hover {
+      transform: none !important;
+      background: rgba(10, 15, 20, 0.6) !important;
+      box-shadow: none !important;
+  }
+
+  .card-simple {
+      padding: 0.5rem !important;
+      gap: 0.2rem;
+  }
+  .card-simple .item-title { font-size: 1rem !important; }
 }
 
 /* --- ABOUT PAGE --- */
@@ -492,7 +537,7 @@ footer {
 .page-intro {
     padding: 160px 2rem 4rem;
     text-align: center;
-    max-width: 800px;
+    max-width: 900px; /* Aligned width */
     margin: 0 auto;
     position: relative;
     z-index: 5;
@@ -511,6 +556,7 @@ footer {
 /* Mobile adjustment for quote box */
 @media (max-width: 600px) {
     .quote-glass { padding: 2rem 1.5rem; }
+    .page-title { font-size: 1.4rem; } /* Smaller reading room title */
 }
 
 .page-title {
@@ -552,10 +598,8 @@ footer {
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     padding: 1rem 1.5rem;
-    /* UPDATED: Thinner cards with hover reveal */
-    height: 100px;
-    justify-content: center;
-    transition: height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+    /* UPDATED: Removed fixed height to prevent overlap */
+    transition: 
                 transform 0.3s ease, 
                 box-shadow 0.3s ease,
                 background 0.3s ease;
@@ -563,14 +607,15 @@ footer {
     color: #fff !important;
     display: flex;
     flex-direction: column;
+    will-change: transform;
 }
 
 a.solid-glass:hover {
-    height: 220px; /* Expand to show content */
     background: rgba(10, 15, 20, 0.9) !important;
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
     border-color: rgba(255, 255, 255, 0.15);
+    z-index: 10; /* Ensure hovered card stays on top */
 }
 
 /* Theme overrides for solid-glass to ensure visibility */
@@ -583,21 +628,8 @@ a.solid-glass:hover {
 .solid-glass.water-theme:hover { box-shadow: 0 0 30px var(--color-water); border-color: var(--color-water); }
 
 /* Hide Meta and Excerpt initially */
-.solid-glass .item-excerpt {
-    opacity: 0;
-    max-height: 0;
-    margin: 0;
-    overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
 
 /* Show on Hover */
-.solid-glass:hover .item-excerpt {
-    opacity: 1;
-    max-height: 200px;
-    margin-bottom: 1rem;
-}
-
 /* --- MOUSE FOLLOW GLOW EFFECT --- */
 .card::after, .solid-glass::after {
     content: "";
@@ -752,5 +784,123 @@ a.solid-glass:hover {
     }
     .reading-main {
         padding: 2rem;
+    }
+}
+
+/* THE EXHIBITION (Anchors) */
+.content-featured {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjusted for 3 columns */
+    gap: 2.5rem;
+    max-width: 900px; /* Aligned width */
+    margin: 0 auto 4rem;
+    position: relative;
+    z-index: 5;
+    padding: 0 2rem; /* Consistent padding */
+    justify-content: center;
+}
+
+.card-anchor {
+    min-height: 160px; /* Smaller initial size for expansion effect */
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.card-anchor.water-theme { box-shadow: 0 5px 20px rgba(0, 119, 190, 0.15); }
+.card-anchor.earth-theme { box-shadow: 0 5px 20px rgba(46, 139, 87, 0.15); }
+.card-anchor.fire-theme { box-shadow: 0 5px 20px rgba(139, 0, 0, 0.15); }
+
+/* Anchor Hover Reveal */
+.card-anchor .item-excerpt {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+}
+.card-anchor:hover .item-excerpt {
+    max-height: 150px;
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+/* ARCHIVE DIVIDER */
+.archive-divider {
+    max-width: 900px; /* Aligned width */
+    margin: 0 auto 3rem;
+    text-align: center;
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+.archive-divider::before,
+.archive-divider::after {
+    content: "";
+    display: block;
+    height: 1px;
+    flex: 1;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3));
+}
+.archive-divider::after {
+    background: linear-gradient(90deg, rgba(255, 215, 0, 0.3), transparent);
+}
+.archive-divider span {
+    color: #FFD700;
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+}
+
+/* THE ARCHIVE (Horizontal Index) */
+.content-archive {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem; /* Consistent gap */
+    max-width: 900px; /* Aligned width */
+    margin: 0 auto 6rem;
+    position: relative;
+    z-index: 5;
+    padding: 0 2rem; /* Consistent padding */
+}
+.card-simple {
+    flex-direction: row !important; /* Forces left/right split */
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 1.2rem 3rem !important;
+    min-height: auto !important;
+    box-sizing: border-box;
+    cursor: pointer;
+    background: rgba(10, 15, 20, 0.5) !important; /* Darker, subtler glass */
+    border-left: 1px solid rgba(255, 255, 255, 0.05) !important; /* Kills the thick colored theme border */
+}
+.card-simple:hover {
+    background: rgba(255, 255, 255, 0.05) !important; /* Subtle white highlight instead of heavy color */
+    transform: translateX(5px) !important; /* Gentle slide right instead of floating up */
+}
+.card-simple .item-title {
+    margin: 0 !important;
+    font-size: 1.2rem;
+    text-align: left;
+}
+.card-simple .item-meta {
+    margin: 0 !important;
+    font-size: 0.85rem;
+    text-align: right;
+    opacity: 0.6;
+}
+.card-simple .item-excerpt {
+    display: none !important;
+}
+
+/* Mobile tweak for archive list */
+@media (max-width: 600px) {
+    .card-simple {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        padding: 1rem;
     }
 }

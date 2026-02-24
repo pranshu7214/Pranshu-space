@@ -3,6 +3,7 @@
 
 let currentScrollY = window.scrollY;
 let targetScrollY = window.scrollY;
+let lastScrollY = currentScrollY;
 let animationFrameId = null;
 
 // Throttle heavy planet math
@@ -36,7 +37,12 @@ window.addEventListener("scroll", () => {
 
 // Debounce resize to avoid browser calculation storms
 let resizeTimeout = null;
+let lastWindowWidth = window.innerWidth;
+
 window.addEventListener("resize", () => {
+    if (window.innerWidth === lastWindowWidth) return; // Ignore vertical-only resize (mobile URL bar)
+    lastWindowWidth = window.innerWidth;
+
     physicsCache.metrics = null; // Drop cached metrics immediately
     if (resizeTimeout) clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
@@ -60,9 +66,12 @@ function updateCinematicPhysics(now) {
         const quoteSection = document.getElementById("quote-section") || document.querySelector(".page-intro");
         const librarySection = document.getElementById("library-section") || document.querySelector(".content-grid");
         const spaceBg = document.querySelector(".space-bg");
-        const cards = document.querySelectorAll(".card, .content-card, .solid-glass"); 
+        const cards = document.querySelectorAll(".card:not(.card-simple), .content-card:not(.card-simple), .solid-glass:not(.card-simple)"); 
 
-        if (jupiterEl) jupiterEl.style.opacity = "0.4";
+        if (jupiterEl) {
+            jupiterEl.style.transition = "opacity 1.5s ease-out";
+            requestAnimationFrame(() => jupiterEl.style.opacity = "0.4");
+        }
         physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards };
     }
     const { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards } = physicsCache.elements;
@@ -99,17 +108,20 @@ function updateCinematicPhysics(now) {
     }
 
     // Interpolate scroll value
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.08);
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.1);
+
+    // Optimization: Only update scroll-dependent elements if scroll changed
+    const isScrolling = Math.abs(currentScrollY - lastScrollY) > 0.01;
 
     // ========== BACKGROUND PARALLAX ==========
-    if (spaceBg) {
+    if (spaceBg && isScrolling) {
         spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(2)}px, 0)`;
     }
 
     // ========== CARDS: VERTICAL PARALLAX ==========
-    if (cards) {
+    if (cards && isScrolling) {
         cards.forEach((card, index) => {
-            if (!card.matches(':hover')) {
+            if (!card.isHovered) {
                 // Staggered movement based on index creates incredible 3D depth
                 const cardParallax = (currentScrollY * 0.02) + (index % 2 * 5);
                 card.style.transform = `translate3d(0, -${cardParallax.toFixed(2)}px, 0)`;
@@ -118,15 +130,7 @@ function updateCinematicPhysics(now) {
         });
     }
 
-    // If on a subpage without planets, continue parallax loop then exit safely
-    if (!jupiterEl || !saturnEl) {
-        if (Math.abs(targetScrollY - currentScrollY) > 0.5) {
-            animationFrameId = requestAnimationFrame(updateCinematicPhysics);
-        } else {
-            animationFrameId = null;
-        }
-        return;
-    }
+    lastScrollY = currentScrollY;
 
     // ACCESSIBILITY: Disable for users who prefer reduced motion
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -137,37 +141,40 @@ function updateCinematicPhysics(now) {
         return;
     }
 
-    // ========== JUPITER: SLINGSHOT EXIT ==========
-    const jupiterZoneEnd = quoteTop;
-    const jupiterProgress = Math.min(Math.max(currentScrollY / jupiterZoneEnd, 0), 1);
+    // Only run planet math if the elements exist
+    if (jupiterEl && saturnEl) {
+        // ========== JUPITER: SLINGSHOT EXIT ==========
+        const jupiterZoneEnd = quoteTop;
+        const jupiterProgress = Math.min(Math.max(currentScrollY / jupiterZoneEnd, 0), 1);
+        
+        const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
+        const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
     
-    const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
-    const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
-
-    const jupiterRotation = (now * 0.005) % 360;
-    const jupiterScale = 0.9 + 0.25 * Math.sin(jupiterProgress * Math.PI); // Restricted zoom
-    jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterRotation.toFixed(2)}deg) scale(${jupiterScale.toFixed(2)})`;
-
-    // ========== SATURN: CURVED PATH ==========
-    const saturnZoneStart = quoteTop; 
-    const saturnZoneEnd = maxScroll;
-    const saturnZoneHeight = Math.max(saturnZoneEnd - saturnZoneStart, 1);
-
-    let saturnProgress = 0;
-    if (currentScrollY >= saturnZoneStart) {
-        saturnProgress = Math.min(Math.max((currentScrollY - saturnZoneStart) / saturnZoneHeight, 0), 1);
+        const jupiterRotation = (now * 0.005) % 360;
+        const jupiterScale = 0.9 + 0.25 * Math.sin(jupiterProgress * Math.PI); // Restricted zoom
+        jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterRotation.toFixed(2)}deg) scale(${jupiterScale.toFixed(2)})`;
+    
+        // ========== SATURN: CURVED PATH ==========
+        const saturnZoneStart = quoteTop; 
+        const saturnZoneEnd = maxScroll;
+        const saturnZoneHeight = Math.max(saturnZoneEnd - saturnZoneStart, 1);
+    
+        let saturnProgress = 0;
+        if (currentScrollY >= saturnZoneStart) {
+            saturnProgress = Math.min(Math.max((currentScrollY - saturnZoneStart) / saturnZoneHeight, 0), 1);
+        }
+    
+        const saturnX = quadraticBezier(saturnPath.p0.x, saturnPath.p1.x, saturnPath.p2.x, saturnProgress);
+        const saturnY = quadraticBezier(saturnPath.p0.y, saturnPath.p1.y, saturnPath.p2.y, saturnProgress);
+    
+        const saturnFade = Math.min(saturnProgress * 4, 1); 
+        const saturnRotation = -(now * 0.005) % 360; // Rotate opposite direction
+        const saturnScale = 0.9 + 0.25 * Math.sin(saturnProgress * Math.PI); // Zoom in/out effect
+    
+        saturnEl.style.opacity = (saturnFade * 0.4).toFixed(2); // Match Jupiter opacity
+        saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnRotation.toFixed(2)}deg) scale(${saturnScale.toFixed(2)})`;
     }
 
-    const saturnX = quadraticBezier(saturnPath.p0.x, saturnPath.p1.x, saturnPath.p2.x, saturnProgress);
-    const saturnY = quadraticBezier(saturnPath.p0.y, saturnPath.p1.y, saturnPath.p2.y, saturnProgress);
-
-    const saturnFade = Math.min(saturnProgress * 4, 1); 
-    const saturnRotation = -(now * 0.005) % 360; // Rotate opposite direction
-    const saturnScale = 0.9 + 0.25 * Math.sin(saturnProgress * Math.PI); // Zoom in/out effect
-
-    saturnEl.style.opacity = (saturnFade * 0.4).toFixed(2); // Match Jupiter opacity
-    saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnRotation.toFixed(2)}deg) scale(${saturnScale.toFixed(2)})`;
-    
     // Engine Loop
     animationFrameId = requestAnimationFrame(updateCinematicPhysics);
 }
@@ -176,12 +183,13 @@ function updateCinematicPhysics(now) {
 function initCardTilt() {
     if (window.matchMedia("(hover: none)").matches) return; // Ignore on touch
 
-    const cards = document.querySelectorAll(".card, .content-card, .solid-glass");
+    const cards = document.querySelectorAll(".card:not(.card-simple), .content-card:not(.card-simple), .solid-glass:not(.card-simple)");
     cards.forEach(card => {
         let rect;
         let ticking = false; // Throttling flag for performance
 
         card.addEventListener("mouseenter", () => {
+            card.isHovered = true;
             rect = card.getBoundingClientRect();
             card.style.transition = "transform 0.1s ease-out, height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
         });
@@ -216,6 +224,7 @@ function initCardTilt() {
         });
 
         card.addEventListener("mouseleave", () => {
+            card.isHovered = false;
             card.style.transition = "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax}px, 0)`;
