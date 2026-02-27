@@ -70,7 +70,7 @@ function updateCinematicPhysics(now) {
         const quoteSection = document.getElementById("quote-section") || document.querySelector(".page-intro");
         const librarySection = document.getElementById("library-section") || document.querySelector(".content-grid");
         const spaceBg = document.querySelector(".space-bg");
-        const cards = document.querySelectorAll(".card:not(.card-simple), .content-card:not(.card-simple), .solid-glass:not(.card-simple)"); 
+        const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)"); 
         const progressBar = document.getElementById('reading-progress');
 
         if (jupiterEl) {
@@ -117,7 +117,7 @@ function updateCinematicPhysics(now) {
         }
 
         physicsCache.metrics = { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics };
-        }
+    }
     const { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics } = physicsCache.metrics;
     
     // ========== READING PROGRESS (Efficient Loop Update) ==========
@@ -225,7 +225,7 @@ function updateCinematicPhysics(now) {
 function initCardTilt() {
     if (window.matchMedia("(hover: none)").matches) return; // Ignore on touch
 
-    const cards = document.querySelectorAll(".card:not(.card-simple), .content-card:not(.card-simple), .solid-glass:not(.card-simple)");
+    const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)");
     cards.forEach(card => {
         let rect;
         let ticking = false; // Throttling flag for performance
