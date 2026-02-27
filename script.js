@@ -13,7 +13,9 @@ let lastPhysicsTime = 0;
 // Performance Cache to prevent memory leaks
 const physicsCache = {
     elements: null,
-    metrics: null
+    metrics: null,
+    sidebar: null,
+    progressBar: null
 };
 
 // Smooth linear interpolation (Lerp)
@@ -34,6 +36,7 @@ window.addEventListener("scroll", () => {
     if (animationFrameId === null) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
+    updateSidebarActiveState();
 }, { passive: true });
 
 // Debounce resize to avoid browser calculation storms
@@ -68,14 +71,15 @@ function updateCinematicPhysics(now) {
         const librarySection = document.getElementById("library-section") || document.querySelector(".content-grid");
         const spaceBg = document.querySelector(".space-bg");
         const cards = document.querySelectorAll(".card:not(.card-simple), .content-card:not(.card-simple), .solid-glass:not(.card-simple)"); 
+        const progressBar = document.getElementById('reading-progress');
 
         if (jupiterEl) {
             jupiterEl.style.transition = "opacity 1.5s ease-out";
             requestAnimationFrame(() => jupiterEl.style.opacity = "0.4");
         }
-        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards };
+        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards, progressBar };
     }
-    const { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards } = physicsCache.elements;
+    const { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards, progressBar } = physicsCache.elements;
 
     // 2. Initialize Metrics Cache (Runs on load & resize)
     if (!physicsCache.metrics) {
@@ -116,6 +120,12 @@ function updateCinematicPhysics(now) {
         }
     const { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics } = physicsCache.metrics;
     
+    // ========== READING PROGRESS (Efficient Loop Update) ==========
+    if (progressBar && maxScroll > 0) {
+        const scrollPercent = (currentScrollY / maxScroll) * 100;
+        progressBar.style.width = `${scrollPercent}%`;
+    }
+
     // MOBILE OPTIMIZATION: Stop ALL heavy physics calculations on mobile to prevent lag
     if (windowWidth < 900) {
         animationFrameId = null;
@@ -130,7 +140,16 @@ function updateCinematicPhysics(now) {
 
     // ========== BACKGROUND PARALLAX ==========
     if (spaceBg && isScrolling) {
-        spaceBg.style.transform = `translate3d(0, -${(currentScrollY * 0.05).toFixed(2)}px, 0)`;
+        if (spaceBg.classList.contains('long-read-bg')) {
+            // Slower speed for long reads, no clamp needed due to larger CSS buffer
+            const parallaxY = currentScrollY * 0.01;
+            spaceBg.style.transform = `translate3d(0, -${parallaxY.toFixed(2)}px, 0)`;
+        } else {
+            // Original logic with clamp for shorter pages
+            const maxParallax = windowHeight * 0.10;
+            const parallaxY = Math.min(currentScrollY * 0.02, maxParallax);
+            spaceBg.style.transform = `translate3d(0, -${parallaxY.toFixed(2)}px, 0)`;
+        }
     }
 
     // ========== CARDS: VERTICAL PARALLAX ==========
@@ -255,11 +274,46 @@ function initCardTilt() {
     });
 }
 
+// ======== SIDEBAR SCROLL SPY ========
+function updateSidebarActiveState() {
+    if (!physicsCache.sidebar) {
+        physicsCache.sidebar = {
+            sections: document.querySelectorAll('.reading-text h3[id], .reading-text h2[id]'),
+            links: document.querySelectorAll('.sidebar-list a')
+        };
+    }
+    const { sections, links } = physicsCache.sidebar;
+
+    if (sections.length === 0) return;
+
+    let currentSectionId = '';
+
+    sections.forEach(section => {
+        if (section.getBoundingClientRect().top < 200) { 
+            currentSectionId = section.getAttribute('id');
+        }
+    });
+
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+            link.classList.remove('active-link');
+            if (currentSectionId && href === '#' + currentSectionId) {
+                link.classList.add('active-link');
+            }
+        }
+    });
+}
+
 // ========== GLOBAL INITIALIZATION & MOBILE MENU ==========
 document.addEventListener("DOMContentLoaded", () => {
     lastPhysicsTime = 0;
     updateCinematicPhysics(performance.now());
     initCardTilt(); 
+    updateSidebarActiveState();
+    setupArchiveComingSoon(); // Initialize Archive Toggle
+    initReadingFeatures(); // Initialize Reading Time & Share
+    initBackToTop(); // Initialize Back to Top button
 
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
@@ -293,10 +347,14 @@ document.addEventListener('contextmenu', function(e) {
 
 // ======== READING PROGRESS ========
 function updateReadingProgress() {
-    const progressBar = document.getElementById('reading-progress');
+    // Use cached element if available, otherwise query
+    const progressBar = (physicsCache.elements && physicsCache.elements.progressBar) 
+        ? physicsCache.elements.progressBar 
+        : document.getElementById('reading-progress');
+
     if (progressBar) {
         let maxScroll;
-        // Optimization: Use cached metrics if available to avoid layout thrashing
+        // Use cached metrics if available
         if (physicsCache.metrics && physicsCache.metrics.maxScroll) {
             maxScroll = physicsCache.metrics.maxScroll;
         } else {
@@ -309,4 +367,91 @@ function updateReadingProgress() {
             progressBar.style.width = `${scrollPercent}%`;
         }
     }
+}
+
+// ======== ARCHIVE COMING SOON TOGGLE ========
+function setupArchiveComingSoon() {
+    const archiveSection = document.querySelector('.content-archive');
+    if (!archiveSection) return;
+
+    // 1. Enable Coming Soon Mode (Hides cards via CSS class)
+    archiveSection.classList.add('coming-soon-mode');
+
+    // 2. Create UI Elements (Arrow & Message)
+    const container = document.createElement('div');
+    container.className = 'archive-toggle-container';
+
+    const btn = document.createElement('button');
+    btn.className = 'archive-toggle-btn';
+    btn.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+    btn.setAttribute('aria-label', 'Show Status');
+
+    const msg = document.createElement('div');
+    msg.className = 'archive-message';
+    msg.innerHTML = '<p>Coming Soon</p>';
+
+    // 3. Assemble and Inject
+    container.appendChild(btn);
+    container.appendChild(msg);
+    archiveSection.appendChild(container);
+
+    // 4. Interaction Logic
+    btn.addEventListener('click', () => {
+        btn.classList.toggle('active');
+        msg.classList.toggle('visible');
+    });
+}
+
+// ======== READING FEATURES (Time & Share) ========
+function initReadingFeatures() {
+    // 1. Calculate Reading Time
+    const articleText = document.querySelector('.reading-text');
+    const timeDisplay = document.getElementById('sidebar-reading-time');
+    
+    if (articleText && timeDisplay) {
+        const text = articleText.innerText;
+        const wpm = 200; // Average reading speed
+        const words = text.trim().split(/\s+/).length;
+        const time = Math.ceil(words / wpm);
+        timeDisplay.innerHTML = `<i class="fa-regular fa-clock"></i> ${time} min read`;
+    }
+
+    // 2. Share Button Logic
+    const shareBtn = document.getElementById('sidebar-share-btn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                const originalHTML = shareBtn.innerHTML;
+                shareBtn.innerHTML = '<i class="fa-solid fa-check"></i> Link Copied';
+                shareBtn.classList.add('copied');
+                setTimeout(() => {
+                    shareBtn.innerHTML = originalHTML;
+                    shareBtn.classList.remove('copied');
+                }, 2000);
+            });
+        });
+    }
+}
+
+// ======== BACK TO TOP BUTTON ========
+function initBackToTop() {
+    const backToTopBtn = document.getElementById('back-to-top');
+
+    if (!backToTopBtn) return; // Only run on pages where the button exists
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > window.innerHeight / 2) { // Show after half a screen scroll
+            backToTopBtn.classList.add('visible');
+        } else {
+            backToTopBtn.classList.remove('visible');
+        }
+    }, { passive: true });
+
+    backToTopBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
 }

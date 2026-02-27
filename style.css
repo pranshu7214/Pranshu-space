@@ -48,13 +48,19 @@ body {
 /* --- BACKGROUNDS --- */
 .space-bg {
   position: fixed;
-  top: -10%; left: 0;
-  width: 100%; height: 120%; /* Taller to allow parallax movement */
+  top: -20%; left: 0;
+  width: 100%; height: 140%; /* Taller to allow parallax movement */
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("images/universe.webp") center/cover no-repeat;
   z-index: -10; /* Pushed further back */
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden; /* Improves scroll/parallax performance */
+}
+
+/* Special parallax for very long pages */
+.space-bg.long-read-bg {
+    height: 200%; /* Much taller buffer */
+    top: -50%;
 }
 
 /* Page Specific Backgrounds */
@@ -534,6 +540,8 @@ footer p {
   flex: 1;
   text-align: center;
   padding: 0 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 .page-content h1 {
   font-size: 3rem;
@@ -569,7 +577,7 @@ footer p {
 .page-intro {
     padding: 160px 2rem 4rem;
     text-align: center;
-    max-width: 900px; /* Aligned width */
+    max-width: 1350px; /* Increased to accommodate wider reading layout */
     margin: 0 auto;
     position: relative;
     z-index: 5;
@@ -581,7 +589,9 @@ footer p {
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     margin: 0 auto;
-    display: inline-block;
+    display: block;
+    width: 100%;
+    max-width: 1100px; /* Constrained to match About page content */
     text-align: center;
 }
 
@@ -710,9 +720,11 @@ a.solid-glass:hover {
 .reading-container {
     display: flex;
     gap: 3rem;
-    padding: 200px 5vw 6rem !important; /* Pushes content below the 105px ribbon */
-    max-width: 1200px;
-    margin: 0 auto;
+    /* Asymmetric padding: Right aligns to 1100px center, Left pushes out for sidebar */
+    padding: 200px max(2rem, calc(50vw - 550px)) 6rem max(2rem, calc(50vw - 650px)) !important;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
     position: relative;
     z-index: 5;
     align-items: flex-start;
@@ -722,6 +734,16 @@ a.solid-glass:hover {
 .reading-main {
     flex: 1;
     padding: 3rem 4rem;
+    max-width: 1100px; /* Increased to fill available space */
+    width: 100%;
+}
+
+/* Override for Centered pages (About) */
+.reading-container.container-centered {
+    padding: 200px 2rem 6rem !important;
+    max-width: 1100px;
+    margin: 0 auto;
+    justify-content: center;
 }
 
 .reading-main h1 {
@@ -790,6 +812,8 @@ a.solid-glass:hover {
 
 .sidebar-list a:hover, .sidebar-list a.active-link {
     color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+    padding-left: 5px; /* Subtle shift */
 }
 
 /* --- Page Load Animation --- */
@@ -824,7 +848,7 @@ a.solid-glass:hover {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Adjusted for 3 columns */
     gap: 2.5rem;
-    max-width: 900px; /* Aligned width */
+    max-width: 1100px; /* Aligned width */
     margin: 0 auto 4rem;
     position: relative;
     z-index: 5;
@@ -858,7 +882,7 @@ a.solid-glass:hover {
 
 /* ARCHIVE DIVIDER */
 .archive-divider {
-    max-width: 900px; /* Aligned width */
+    max-width: 1100px; /* Aligned width */
     margin: 0 auto 3rem;
     text-align: center;
     position: relative;
@@ -891,7 +915,7 @@ a.solid-glass:hover {
     display: flex;
     flex-direction: column;
     gap: 2rem; /* Consistent gap */
-    max-width: 900px; /* Aligned width */
+    max-width: 1100px; /* Aligned width */
     margin: 0 auto 6rem;
     position: relative;
     z-index: 5;
@@ -953,4 +977,236 @@ a.solid-glass:hover {
     }
     .card-simple .item-title { font-size: 1.1rem !important; width: 100%; margin-bottom: 0.2rem !important; }
     .card-simple .item-meta { text-align: left !important; font-size: 0.9rem !important; margin: 0 !important; opacity: 0.6; width: 100%; }
+}
+
+/* Force razor-sharp text inside glass cards */
+.solid-glass h2, .solid-glass p {
+    text-shadow: none !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+    transform: translateZ(0); /* Snaps text to the pixel grid */
+    color: #ffffff !important; /* Forces maximum contrast */
+}
+
+/* --- READING PAGE SPECIFIC LAYOUT --- */
+/* Removes the gap between title and content for reading pages */
+.page-intro.reading-layout {
+    padding-top: 200px;
+    padding-bottom: 1rem;
+}
+
+.reading-container.reading-layout {
+    padding-top: 0 !important;
+}
+
+/* --- SEALED DOCUMENT STYLE --- */
+.sealed-document {
+    text-align: center; 
+    padding: 3rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.sealed-icon {
+    font-size: 2.5rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 0.5rem;
+}
+
+.sealed-title {
+    font-size: 2rem; 
+    margin-bottom: 0.5rem; 
+    color: #fff;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+.sealed-text {
+    font-size: 1.1rem; 
+    line-height: 1.6; 
+    color: #e0e0e0; 
+    max-width: 600px; 
+    margin: 0 auto;
+}
+
+/* --- SIDEBAR STATES --- */
+.sidebar-link-disabled {
+    color: #555;
+    cursor: default;
+    font-size: 1.1rem;
+    transition: color 0.3s;
+}
+.sidebar-link-disabled:hover {
+    color: #777; /* Subtle change only */
+}
+
+/* --- ARCHIVE COMING SOON TOGGLE --- */
+/* Hides the cards when JS activates this mode */
+.content-archive.coming-soon-mode .card-simple {
+    display: none !important;
+}
+
+.archive-toggle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 2rem 0;
+    animation: fadeInUp 1s ease forwards;
+}
+
+.archive-toggle-btn {
+    background: none;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    color: #FFD700;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.archive-toggle-btn:hover {
+    background: rgba(255, 215, 0, 0.1);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.archive-toggle-btn.active {
+    transform: rotate(180deg);
+    background: #FFD700;
+    color: #000;
+}
+
+.archive-message {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.5s ease;
+    text-align: center;
+    color: #e0e0e0;
+    font-style: italic;
+    font-size: 1.2rem;
+    letter-spacing: 0.05em;
+}
+
+.archive-message.visible {
+    max-height: 100px;
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+/* --- SIDEBAR EXTRAS --- */
+.sidebar-reading-time {
+    font-size: 0.9rem;
+    color: #FFD700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
+}
+
+.sidebar-share-btn {
+    margin-top: 2rem;
+    width: 100%;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+}
+
+.sidebar-share-btn:hover {
+    background: rgba(255, 215, 0, 0.1);
+    color: #FFD700;
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.sidebar-share-btn.copied {
+    background: rgba(46, 139, 87, 0.2);
+    color: #81C784;
+    border-color: #81C784;
+}
+
+/* --- READ NEXT BUTTON --- */
+.read-next-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.read-next-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.read-next-btn:hover {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: #FFD700;
+    color: #FFD700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    transform: translateX(5px);
+}
+
+/* --- BACK TO TOP BUTTON --- */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    background: rgba(10, 15, 20, 0.8);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 50%;
+    color: #FFD700;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    z-index: 998; /* Below ribbon but above content */
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.back-to-top-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+.back-to-top-btn:hover {
+    background: rgba(255, 215, 0, 0.1);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    transform: scale(1.1);
 }
