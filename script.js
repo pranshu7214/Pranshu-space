@@ -371,6 +371,9 @@ function updateReadingProgress() {
 
 // ======== ARCHIVE COMING SOON TOGGLE ========
 function setupArchiveComingSoon() {
+    // Keep Poems archive open
+    if (document.querySelector('nav a[href="poems.html"]')?.classList.contains('active')) return;
+
     const archiveSection = document.querySelector('.content-archive');
     if (!archiveSection) return;
 

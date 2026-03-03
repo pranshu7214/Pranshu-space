@@ -65,15 +65,15 @@ body {
 
 /* Page Specific Backgrounds */
 .space-bg.bg-poems {
-  background-image: radial-gradient(circle at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%),
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%),
               url("images/bg-poems.webp");
 }
 .space-bg.bg-essays {
-  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%),
               url("images/bg-essays.webp");
 }
 .space-bg.bg-fiction {
-  background-image: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.6) 100%),
+  background-image: radial-gradient(circle at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%),
               url("images/bg-fiction.webp");
 }
 .space-bg.bg-about {
@@ -769,7 +769,7 @@ a.solid-glass:hover {
 
 .reading-text {
     margin-top: 3rem;
-    font-size: 1.125rem;
+    font-size: 1.1rem;
     line-height: 1.8;
     color: #e0e0e0;
     text-align: justify;
@@ -777,6 +777,25 @@ a.solid-glass:hover {
 
 .reading-text p {
     margin-bottom: 2rem;
+}
+
+/* POEM SPECIFIC STYLE - Apply class 'poem' to reading-text div for poems */
+.reading-text.poem,
+.reading-text pre {
+    font-family: inherit;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    text-align: center; /* Optional: Centers poem text */
+}
+
+/* Specific container for poem body (Moved from inline HTML) */
+.poem-content {
+    max-width: 450px; 
+    margin: 2rem auto; 
+    font-size: 1.1rem; 
+    line-height: 1.9; 
+    color: #f0f0f0; 
+    letter-spacing: 0.03em;
 }
 
 /* Drop Cap for the first letter of the story */
@@ -822,7 +841,7 @@ a.solid-glass:hover {
 .sidebar-list a {
     color: #aaa;
     text-decoration: none;
-    font-size: 1.1rem;
+    font-size: 1rem;
     transition: color 0.3s;
 }
 
@@ -1040,7 +1059,7 @@ a.solid-glass:hover {
 }
 
 .sealed-text {
-    font-size: 1rem; 
+    font-size: 1.1rem; 
     line-height: 1.6; 
     color: #e0e0e0; 
     max-width: 600px; 
@@ -1121,7 +1140,7 @@ a.solid-glass:hover {
 
 /* --- SIDEBAR EXTRAS --- */
 .sidebar-reading-time {
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: #FFD700;
     margin-bottom: 1.5rem;
     display: flex;
@@ -1165,22 +1184,26 @@ a.solid-glass:hover {
 /* --- READ NEXT BUTTON --- */
 .read-next-wrapper {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-top: 2rem;
     width: 100%;
+}
+
+.read-next-wrapper.align-right {
+    justify-content: flex-end;
 }
 
 .read-next-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.8rem;
-    padding: 0.8rem 2rem;
+    gap: 0.5rem;
+    padding: 0.5rem 1.2rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 50px;
     color: #fff;
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 0.8rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     transition: all 0.3s ease;
@@ -1226,4 +1249,21 @@ a.solid-glass:hover {
     background: rgba(255, 215, 0, 0.1);
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
     transform: scale(1.1);
+}
+
+/* --- POEM SPECIFIC STYLES --- */
+.poem-content > * {
+    margin-bottom: 2.5rem;
+}
+
+.poem-content .poem-closing {
+    font-style: italic; 
+    color: #FFD700;
+}
+
+.reading-divider {
+    border: 0; 
+    height: 1px; 
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent); 
+    margin: 4rem 0 2rem;
 }
