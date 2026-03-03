@@ -133,7 +133,7 @@ function updateCinematicPhysics(now) {
     }
 
     // Interpolate scroll value
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.05);
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.25); // Increased for absolute free scroll feel
 
     // Optimization: Only update scroll-dependent elements if scroll changed
     const isScrolling = Math.abs(currentScrollY - lastScrollY) > 0.01;
