@@ -32,11 +32,9 @@ function quadraticBezier(p0, p1, p2, t) {
 // Track scroll position (Passive flag makes native scrolling much faster)
 window.addEventListener("scroll", () => {
     targetScrollY = window.scrollY;
-    updateReadingProgress();
     if (animationFrameId === null) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
-    updateSidebarActiveState();
 }, { passive: true });
 
 // Debounce resize to avoid browser calculation storms
@@ -171,6 +169,9 @@ function updateCinematicPhysics(now) {
             }
         });
     }
+
+    // Update sidebar state only when scrolling to save resources
+    if (isScrolling) updateSidebarActiveState();
 
     lastScrollY = currentScrollY;
 
@@ -384,10 +385,6 @@ function setupArchiveComingSoon() {
     const activePoemLink = document.querySelector('nav a[href="poems.html"].active') || 
                            document.querySelector('nav a[href="../poems/"].active') ||
                            document.querySelector('nav a[href="#"].active'); // For self-reference
-
-    // If we are on the poems page, check if the "The Poetry" title exists to be sure
-    const pageTitle = document.querySelector('.page-title');
-    if (pageTitle && pageTitle.innerText.includes('THE POETRY')) return;
 
     const archiveSection = document.querySelector('.content-archive');
     if (!archiveSection) return;
