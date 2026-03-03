@@ -5,12 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Reading Room</title>
   <meta name="description" content="The most dangerous thing you can do is listen to your own soul in a world that demands your silence." />
-  <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="shortcut icon" href="favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="The Reading Room | by Pranshu">
+  <meta property="og:description" content="A quiet personal website for my poems, essays, and stories.">
+  <meta property="og:image" content="https://pranshu.space/images/bg-poems.webp"> <!-- Use an absolute URL for the share image -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Reading Room | by Pranshu">
+  <meta name="twitter:description" content="A quiet personal website for my poems, essays, and stories.">
+  <meta name="twitter:image" content="https://pranshu.space/images/bg-poems.webp">
+  
+  <link rel="icon" type="image/png" href="images/icons/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="images/icons/favicon.svg" />
+  <link rel="shortcut icon" href="images/icons/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="images/icons/apple-touch-icon.png" />
   <meta name="apple-mobile-web-app-title" content="Pranshu Lib" />
-  <link rel="manifest" href="site.webmanifest" />
+  <link rel="manifest" href="images/icons/site.webmanifest" />
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,48 +36,39 @@
   <div class="planet saturn"></div>
 
   <header class="ribbon">
-  <a href="index.html" class="mobile-home-icon active"><i class="fa-solid fa-house"></i></a>
+  <a href="/" class="mobile-home-icon active"><i class="fa-solid fa-house"></i></a>
 
   <nav class="nav-left desktop-only">
-    <a href="index.html" aria-label="Home" class="home-icon active">
+    <a href="/" aria-label="Home" class="home-icon active">
         <i class="fa-solid fa-house"></i>
     </a>
-    <a href="essays.html">Essays</a>
-    <a href="poems.html">Poems</a>
-    <a href="fiction.html">Fiction</a>
+    <a href="essays/">Essays</a>
+    <a href="poems/">Poems</a>
+    <a href="fiction/">Fiction</a>
   </nav>
 
   <div class="nav-logo">
-    <a href="index.html">
+    <a href="/" aria-label="The Reading Room Home">
       <img src="images/final-logo.png" alt="The Reading Room Logo">
     </a>
   </div>
 
   <nav class="nav-right desktop-only">
-    <a href="about.html">About</a>
-    
-    <div class="nav-socials">
-       <a href="https://www.instagram.com/pranshu.writes/" target="_blank" rel="noopener noreferrer">
-         <i class="fa-brands fa-instagram"></i>
-       </a>
-       <a href="https://twitter.com/pranshu_writes" target="_blank" rel="noopener noreferrer">
-         <i class="fa-brands fa-x-twitter"></i>
-       </a>
-       <a href="mailto:pranshu.writes@gmail.com">
-         <i class="fa-solid fa-envelope"></i>
-       </a>
-    </div>
+    <a href="about/">About</a>
+    <a href="https://pranshuspace.substack.com/subscribe" target="_blank" rel="noopener noreferrer" class="subscribe-btn">Subscribe</a>
   </nav>
 
-  <div class="menu-toggle"><i class="fa-solid fa-bars"></i></div>
+  <div class="menu-toggle" role="button" aria-label="Toggle Navigation" tabindex="0"><i class="fa-solid fa-bars"></i></div>
 </header>
 
   <!-- Mobile Menu -->
   <div id="mobileMenu" class="mobile-nav-overlay">
-      <a href="essays.html">Essays</a>
-      <a href="poems.html">Poems</a>
-      <a href="fiction.html">Fiction</a>
-      <a href="about.html">About</a>
+      <a href="/" class="active">Home</a>
+      <a href="essays/">Essays</a>
+      <a href="poems/">Poems</a>
+      <a href="fiction/">Fiction</a>
+      <a href="about/">About</a>
+      <a href="https://pranshuspace.substack.com/subscribe" target="_blank" class="mobile-subscribe-btn">Subscribe</a>
   </div>
 
   <main>
@@ -91,7 +92,7 @@
     <section class="library" id="library-section">
       <div class="cards-container">
         
-        <a href="essays.html" class="card earth-theme">
+        <a href="essays/" class="card earth-theme">
           <div class="card-bg"></div>
           <div class="card-content">
             <span class="card-title">Essays</span>
@@ -105,22 +106,22 @@
           </div>
         </a>
 
-        <a href="poems.html" class="card fire-theme">
+        <a href="poems/" class="card fire-theme">
           <div class="card-bg"></div>
           <div class="card-content">
             <span class="card-title">Poems</span>
             <div class="card-quote">
               <p>
-                "The shard, the glass so very sharp,<br>
-                cut through her soul, yet she lived.<br>
-                Why then the scalpel, when it cut her veins,<br>
-                did not spare?"
+                "Our eyes connected; oh, it couldn't be more divine,<br>
+                A smile was returned—can I consider that a sign?<br>
+                But how would I talk to her? Shy am I, and that's just fine,<br>
+                It's easy for a letter to ask someone out to dine."
               </p>
             </div>
           </div>
         </a>
 
-        <a href="fiction.html" class="card water-theme">
+        <a href="fiction/" class="card water-theme">
           <div class="card-bg"></div>
           <div class="card-content">
             <span class="card-title">Fiction</span>
@@ -138,11 +139,29 @@
     </section>
 
     <footer>
-      <p>© 2026 Pranshu. All rights reserved.</p>
-      <div class="footer-icons">
-        <a href="https://www.instagram.com/pranshu.writes/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://twitter.com/pranshu_writes" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i></a>
-        <a href="mailto:pranshu.writes@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+      <div class="footer-catch">
+        <p>Step inside. I’ll leave the newest pages directly on your desk.</p>
+        <a href="https://pranshuspace.substack.com/subscribe" target="_blank" rel="noopener noreferrer" class="subscribe-btn-footer">Subscribe</a>
+      </div>
+      <div class="footer-bottom">
+        <p class="copyright">© 2026 Pranshu Gupta. All rights reserved.</p>
+        <p class="footer-quote">"The ultimate goal is to be free."</p>
+      </div>
+      <div class="footer-right">
+        <div class="footer-links">
+          <a href="essays/">Essays</a> 
+          <span>&#183;</span> 
+          <a href="poems/">Poems</a> 
+          <span>&#183;</span> 
+          <a href="fiction/">Fiction</a> 
+          <span>&#183;</span> 
+          <a href="about/">About</a>
+        </div>
+        <div class="footer-socials">
+          <a href="https://instagram.com/pranshu.space/" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://x.com/pranshuspace" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="mailto:hello.pranshuspace@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+        </div>
       </div>
     </footer>
 

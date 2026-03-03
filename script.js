@@ -1,4 +1,4 @@
-// ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.1 (MASTER) ========
+// ======== CINEMATIC SCROLL PHYSICS SYSTEM v2.2 (MASTER) ========
 // Premium parallax + planet motion, tuned for maximum smoothness & performance
 
 let currentScrollY = window.scrollY;
@@ -32,11 +32,9 @@ function quadraticBezier(p0, p1, p2, t) {
 // Track scroll position (Passive flag makes native scrolling much faster)
 window.addEventListener("scroll", () => {
     targetScrollY = window.scrollY;
-    updateReadingProgress();
     if (animationFrameId === null) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
-    updateSidebarActiveState();
 }, { passive: true });
 
 // Debounce resize to avoid browser calculation storms
@@ -102,7 +100,7 @@ function updateCinematicPhysics(now) {
             p2: { x: -250, y: windowHeight * 0.15 }
         };
 
-// Pre-calculate card positions for visibility check (Optimization)
+        // Pre-calculate card positions for visibility check (Optimization)
         const cardMetrics = [];
         if (cards) {
             cards.forEach(card => {
@@ -133,7 +131,7 @@ function updateCinematicPhysics(now) {
     }
 
     // Interpolate scroll value
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.1);
+    currentScrollY = lerp(currentScrollY, targetScrollY, 0.25); // Increased for absolute free scroll feel
 
     // Optimization: Only update scroll-dependent elements if scroll changed
     const isScrolling = Math.abs(currentScrollY - lastScrollY) > 0.01;
@@ -172,13 +170,16 @@ function updateCinematicPhysics(now) {
         });
     }
 
+    // Update sidebar state only when scrolling to save resources
+    if (isScrolling) updateSidebarActiveState();
+
     lastScrollY = currentScrollY;
 
     // ACCESSIBILITY: Disable for users who prefer reduced motion
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     if (motionQuery.matches) {
-        jupiterEl.style.display = 'none';
-        saturnEl.style.display = 'none';
+        if (jupiterEl) jupiterEl.style.display = 'none';
+        if (saturnEl) saturnEl.style.display = 'none';
         animationFrameId = null;
         return;
     }
@@ -270,6 +271,14 @@ function initCardTilt() {
             card.style.transition = "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax}px, 0)`;
+
+            // Remove transform transition after tilt reset so parallax isn't laggy
+            if (card.resetTimeout) clearTimeout(card.resetTimeout);
+            card.resetTimeout = setTimeout(() => {
+                if (!card.isHovered) {
+                    card.style.transition = "height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+                }
+            }, 600);
         });
     });
 }
@@ -371,8 +380,11 @@ function updateReadingProgress() {
 
 // ======== ARCHIVE COMING SOON TOGGLE ========
 function setupArchiveComingSoon() {
-    // Keep Poems archive open
-    if (document.querySelector('nav a[href="poems.html"]')?.classList.contains('active')) return;
+    // IMPORTANT: Check if we are on the POEMS page by looking for the active class in nav
+    // If we are on Poems page, we DO NOT want to hide the archive!
+    const activePoemLink = document.querySelector('nav a[href="poems.html"].active') || 
+                           document.querySelector('nav a[href="../poems/"].active') ||
+                           document.querySelector('nav a[href="#"].active'); // For self-reference
 
     const archiveSection = document.querySelector('.content-archive');
     if (!archiveSection) return;
@@ -439,17 +451,31 @@ function initReadingFeatures() {
 // ======== BACK TO TOP BUTTON ========
 function initBackToTop() {
     const backToTopBtn = document.getElementById('back-to-top');
+    const footer = document.querySelector('footer');
 
-    if (!backToTopBtn) return; // Only run on pages where the button exists
+    if (!backToTopBtn || !footer) return; // Only run on pages where both elements exist
+
+    const buttonBottomMargin = 32; // 2rem margin
 
     window.addEventListener('scroll', () => {
-        if (window.scrollY > window.innerHeight / 2) { // Show after half a screen scroll
+        const footerTop = footer.offsetTop;
+        const scrollBottom = window.scrollY + window.innerHeight;
+
+        // Show/hide button
+        if (window.scrollY > window.innerHeight / 2) {
             backToTopBtn.classList.add('visible');
         } else {
             backToTopBtn.classList.remove('visible');
         }
-    }, { passive: true });
 
+        // Adjust position to avoid footer overlap
+        if (scrollBottom > footerTop) {
+            backToTopBtn.style.bottom = `${scrollBottom - footerTop + buttonBottomMargin}px`;
+        } else {
+            backToTopBtn.style.bottom = `${buttonBottomMargin}px`;
+        }
+    }, { passive: true });
+    
     backToTopBtn.addEventListener('click', (e) => {
         e.preventDefault();
         window.scrollTo({
