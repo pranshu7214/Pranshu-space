@@ -1340,31 +1340,78 @@ a.solid-glass:hover {
 .sidebar-share-btn {
     margin-top: 2rem;
     width: 100%;
-    padding: 0.8rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #ccc;
+    padding: 0.9rem 1.5rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e0e0e0;
     cursor: pointer;
     font-family: var(--font-main);
-    font-size: 1rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    border-radius: 4px;
+    gap: 0.8rem;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border-radius: 50px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
 }
 
 .sidebar-share-btn:hover {
-    background: rgba(255, 215, 0, 0.1);
+    background: rgba(255, 215, 0, 0.08);
+    border-color: #FFD700;
     color: #FFD700;
-    border-color: rgba(255, 215, 0, 0.3);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+    transform: translateY(-2px);
+    letter-spacing: 0.2em;
+    color: transparent;
+}
+
+.sidebar-share-btn i {
+    transition: transform 0.4s ease;
+}
+
+.sidebar-share-btn:hover i {
+    transform: translateY(-20px);
+    opacity: 0;
+}
+
+.sidebar-share-btn::after {
+    content: "Copy Link";
+    font-family: var(--font-main);
+    font-weight: 400; /* Match original button weight */
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFD700;
+    font-size: 0.9rem; /* Match original font size */
+    letter-spacing: 0.15em; /* Match original letter spacing */
+    text-transform: uppercase; /* Match original text transform */
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sidebar-share-btn:hover::after {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .sidebar-share-btn.copied {
-    background: rgba(46, 139, 87, 0.2);
+    background: rgba(46, 139, 87, 0.15);
     color: #81C784;
     border-color: #81C784;
+    box-shadow: 0 0 20px rgba(129, 199, 132, 0.2);
+    pointer-events: none;
+}
+
+.sidebar-share-btn.copied::after {
+    display: none;
 }
 
 /* --- READ NEXT BUTTON --- */
@@ -1373,6 +1420,7 @@ a.solid-glass:hover {
     justify-content: space-between;
     margin-top: 2rem;
     width: 100%;
+    gap: 2rem;
 }
 
 .read-next-wrapper.align-right {
@@ -1382,17 +1430,21 @@ a.solid-glass:hover {
 .read-next-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    padding: 0.5rem 1.2rem;
+    padding: 0.6rem 1.4rem;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 50px;
     color: #fff;
     text-decoration: none;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     transition: all 0.3s ease;
+    max-width: 48%;
+    text-align: center;
+    line-height: 1.4;
 }
 
 .read-next-btn:hover {
@@ -1551,9 +1603,9 @@ a.solid-glass:hover {
   }
 
   .read-next-btn {
-    padding: 0.2rem 0.3rem !important; 
-    font-size: 0.5rem !important; 
-    letter-spacing: 0 !important;
+    padding: 0.6rem 1rem !important; 
+    font-size: 0.75rem !important; 
+    letter-spacing: 0.05em !important;
   }
 
   /* 6. Reduce Content Font Size */
@@ -1566,5 +1618,26 @@ a.solid-glass:hover {
   .reading-container.container-centered {
     padding: 0 0 4rem 0 !important; /* Full width, no top padding */
     width: 100%;
+  }
+
+  /* 8. Compact Sidebar & Share Button on Mobile */
+  .sidebar-title {
+      font-size: 1rem !important;
+      margin-bottom: 1rem !important;
+  }
+  .sidebar-list a {
+      font-size: 0.9rem !important;
+  }
+  .sidebar-reading-time {
+      font-size: 0.9rem !important;
+      margin-bottom: 1rem !important;
+  }
+  .sidebar-share-btn {
+      padding: 0.6rem 1rem !important;
+      font-size: 0.8rem !important;
+      margin-top: 1.5rem !important;
+  }
+  .sidebar-share-btn::after {
+      font-size: 0.8rem !important;
   }
 }
