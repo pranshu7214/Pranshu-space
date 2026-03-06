@@ -1597,15 +1597,20 @@ a.solid-glass:hover {
     align-self: center;
   }
 
-  /* 5. Smaller Read Next/Prev Buttons */
+  /* 5. Fix for Squished Next/Previous Buttons */
   .read-next-wrapper {
-    gap: 1rem !important;
+    flex-direction: column !important; /* Stacks them one on top of the other */
+    gap: 1rem !important; /* Adds breathing room between the two buttons */
+    align-items: stretch !important;
   }
 
   .read-next-btn {
-    padding: 0.6rem 1rem !important; 
-    font-size: 0.75rem !important; 
-    letter-spacing: 0.05em !important;
+    width: 100% !important; /* Forces them to be full width */
+    justify-content: center !important; /* Centers the text inside */
+    padding: 0.7rem 1rem !important; /* Trims the height */
+    text-align: center !important;
+    max-width: none !important;
+    font-size: 0.8rem !important;
   }
 
   /* 6. Reduce Content Font Size */
