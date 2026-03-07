@@ -187,7 +187,7 @@ function updateCinematicPhysics(now) {
     // Only run planet math if the elements exist
     if (jupiterEl && saturnEl) {
         // ========== JUPITER: SLINGSHOT EXIT ==========
-        const jupiterZoneEnd = quoteTop;
+        const jupiterZoneEnd = quoteTop * 1.2; // Slowed down to bridge gap with Saturn
         const jupiterProgress = Math.min(Math.max(currentScrollY / jupiterZoneEnd, 0), 1);
         
         const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
@@ -222,8 +222,8 @@ function updateCinematicPhysics(now) {
     animationFrameId = requestAnimationFrame(updateCinematicPhysics);
 }
 
-// ======== 3D CARD TILT EFFECT ========
-function initCardTilt() {
+// ======== CARD GLOW & LIFT EFFECT (No Tilt to prevent blur) ========
+function initCardGlow() {
     if (window.matchMedia("(hover: none)").matches) return; // Ignore on touch
 
     const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)");
@@ -234,7 +234,10 @@ function initCardTilt() {
         card.addEventListener("mouseenter", () => {
             card.isHovered = true;
             rect = card.getBoundingClientRect();
-            card.style.transition = "transform 0.1s ease-out, height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+            card.style.transition = "transform 0.3s ease-out, height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+            
+            const currentParallax = parseFloat(card.dataset.currentParallax || 0);
+            card.style.transform = `translate3d(0, ${currentParallax - 5}px, 0)`;
         });
 
         card.addEventListener("mousemove", (e) => {
@@ -251,15 +254,6 @@ function initCardTilt() {
                     card.style.setProperty("--mouse-x", `${x}px`);
                     card.style.setProperty("--mouse-y", `${y}px`);
 
-                    // Tilt Logic
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -5; 
-                    const rotateY = ((x - centerX) / centerX) * 5;
-
-                    const currentParallax = parseFloat(card.dataset.currentParallax || 0);
-                    card.style.transform = `perspective(1000px) translate3d(0, ${currentParallax}px, 0) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.02)`;
-                    
                     ticking = false;
                 });
                 ticking = true;
@@ -314,15 +308,93 @@ function updateSidebarActiveState() {
     });
 }
 
+// ======== MUSEUM DISPLAY INTERACTIVITY ========
+function initMuseumDisplay() {
+    const museumItems = document.querySelectorAll('.museum-item');
+    const stageLabel = document.getElementById('stage-label');
+    const stageQuote = document.getElementById('stage-quote');
+    const stageContent = document.querySelector('.stage-content');
+    const stageLink = document.getElementById('stage-link');
+
+    // Exit if we're not on the homepage with the museum display
+    if (!museumItems.length || !stageQuote || !stageContent || !stageLabel || !stageLink) {
+        return;
+    }
+
+    const contentData = {
+        essays: {
+            label: "The Prose",
+            quote: "\"To truly change the world, we must first change<br>the way we view education. The real test is not<br>in marksheets, but in the human beings it produces.\"",
+            link: "essays/",
+            color: "#81C784" // Earth Green
+        },
+        poems: {
+            label: "The Verse",
+            quote: "\"Our eyes connected; oh, it couldn't be more divine,<br>A smile was returned—can I consider that a sign?<br>But how would I talk to her? Shy am I, and that's just fine,<br>It's easy for a letter to ask someone out to dine.\"",
+            link: "poems/",
+            color: "#E57373" // Fire Red
+        },
+        fiction: {
+            label: "The Tales",
+            quote: "\"You signed off on the body count.<br>Math won’t wash off blood.<br>Don't hide behind patriotism now.\"",
+            link: "fiction/",
+            color: "#64B5F6" // Water Blue
+        }
+    };
+
+    let hoverTimeout;
+
+    museumItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            if (window.innerWidth < 900) return; // Don't run on mobile
+
+            // Clear any pending switch to prevent rapid snapping
+            clearTimeout(hoverTimeout);
+
+            hoverTimeout = setTimeout(() => {
+                const currentCategory = stageContent.dataset.activeCategory;
+                const newCategory = item.dataset.category;
+
+                if (currentCategory === newCategory) return; // Don't re-animate for the same item
+
+                museumItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                const data = contentData[newCategory];
+
+                if (data) {
+                    stageContent.classList.add('stage-fade-out');
+
+                    setTimeout(() => {
+                        stageLabel.textContent = data.label;
+                        stageLabel.style.color = data.color;
+                        stageQuote.innerHTML = data.quote;
+                        stageLink.href = data.link;
+                        stageContent.dataset.activeCategory = newCategory;
+                        stageContent.classList.remove('stage-fade-out');
+                    }, 300); // Match CSS transition duration
+                }
+            }, 50); // 50ms delay to debounce accidental hovers
+        });
+    });
+
+    // Set initial state
+    const initialCategory = 'essays';
+    stageContent.dataset.activeCategory = initialCategory;
+    document.querySelector(`.museum-item[data-category="${initialCategory}"]`).classList.add('active');
+    stageLabel.style.color = contentData[initialCategory].color;
+}
+
 // ========== GLOBAL INITIALIZATION & MOBILE MENU ==========
 document.addEventListener("DOMContentLoaded", () => {
     lastPhysicsTime = 0;
     updateCinematicPhysics(performance.now());
-    initCardTilt(); 
+    initCardGlow(); 
     updateSidebarActiveState();
     setupArchiveComingSoon(); // Initialize Archive Toggle
     initReadingFeatures(); // Initialize Reading Time & Share
     initBackToTop(); // Initialize Back to Top button
+    initMuseumDisplay(); // Initialize Museum Display
 
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
