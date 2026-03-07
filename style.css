@@ -89,7 +89,7 @@ body {
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
-  z-index: 1; /* In front of background, behind quote and cards */
+  z-index: -1; /* Behind content, in front of background */
   will-change: transform, opacity;
   transform: translateZ(0); /* Force hardware acceleration */
   backface-visibility: hidden;
@@ -159,7 +159,7 @@ body {
   font-size: 1.2rem; 
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  transition: color 0.3s, text-shadow 0.3s;
+  transition: color 0.5s, text-shadow 0.5s;
 }
 
 /* Yellow Hover */
@@ -185,7 +185,7 @@ body {
     letter-spacing: 0.15em;
     text-transform: uppercase;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
     border-radius: 2px;
     margin-left: 2rem;
 }
@@ -222,6 +222,7 @@ body {
   letter-spacing: 0.2em; text-transform: uppercase;
   margin-bottom: 2rem; 
   animation: floatHero 6s ease-in-out infinite;
+  will-change: transform;
 }
 
 @keyframes floatHero {
@@ -343,6 +344,7 @@ body {
   height: 2px;
   background: rgba(255, 215, 0, 0.3);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: width, box-shadow;
 }
 
 .museum-item.active h2 {
@@ -407,8 +409,208 @@ body {
   text-align: justify;
 }
 
+/* Museum Stage Card Hover - Yellow Glow */
+.stage-content:hover {
+    border-color: #FFD700 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.3) !important;
+}
+
 .museum-mobile-content {
   display: none;
+}
+
+/* =========================================
+   SHOWCASE GALLERY
+   ========================================= */
+.showcase-container {
+    max-width: 1050px;
+    margin: 0rem auto;
+    padding: 0 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 5rem; /* Spacious breathing room between sections */
+}
+
+.category-heading {
+    text-align: center;
+    font-size: 1.6rem;
+    letter-spacing: 4px;
+    color: #ffcc00; 
+    text-transform: uppercase;
+    margin-bottom: 2.5rem;
+    font-weight: 600;
+}
+
+.card-grid {
+    display: grid;
+    gap: 2rem;
+}
+
+/* 3 Columns for Prose */
+.prose-grid {
+    grid-template-columns: 0.85fr 1fr;
+    align-items: center;
+}
+
+.prose-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* 2 Columns for Verse */
+.verse-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* 1 Column for Tales */
+.tales-grid {
+    grid-template-columns: 1fr;
+}
+
+/* Glass Panel Base */
+.glass-panel {
+    background: rgba(10, 15, 20, 0.5); /* Increased transparency */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    position: relative; /* Required for torch effect positioning */
+    overflow: hidden;   /* Keeps torch glow inside */
+    /* Add the noise texture to match museum cards exactly */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.07'/%3E%3C/svg%3E");
+    padding: 2.5rem 2rem;
+    text-decoration: none;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: box-shadow 0.5s ease, background 0.5s ease;
+    
+    /* Hardware acceleration to prevent text blur on hover */
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    -webkit-font-smoothing: antialiased;
+    will-change: transform; /* Removed box-shadow to save memory */
+}
+
+.glass-panel:hover {
+    transform: translateY(-5px); /* Match solid-glass lift */
+    background: rgba(10, 15, 20, 0.65);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Theme specific hovers for Showcase Gallery */
+.prose-grid .showcase-card:hover {
+    border-color: var(--color-earth);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(129, 199, 132, 0.3); /* Increased glow */
+}
+
+.verse-grid .showcase-card:hover {
+    border-color: var(--color-fire);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(229, 115, 115, 0.3);
+}
+
+.tales-grid .showcase-card:hover {
+    border-color: var(--color-water);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(100, 181, 246, 0.3);
+}
+
+/* Subscribe Card Hover */
+.subscribe-card:hover {
+    border-color: #FFD700;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+/* Inner Card Typography */
+.card-meta {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    display: block;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+.read-link {
+    font-size: 0.85rem;
+    color: #ffcc00;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.5s ease;
+    margin-top: auto; /* Pushes the link to the bottom */
+}
+
+.glass-panel:hover .read-link {
+    opacity: 1;
+}
+
+/* Custom Tales Spotlight Card */
+.large-title {
+    font-size: 1.8rem; /* Made smaller */
+    color: #fff; /* Changed to white */
+    margin-bottom: 1.5rem;
+}
+
+.tales-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Add space at the bottom of the showcase so it doesn't touch footer */
+#showcase-gallery {
+    padding-bottom: 4rem;
+}
+
+.read-button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: #ffcc00;
+    color: #000;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: background 0.5s ease;
+}
+
+.read-button:hover {
+    background: #e6b800;
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+@media (max-width: 900px) {
+    .prose-grid, .verse-grid {
+        grid-template-columns: 1fr; /* Stacks cards vertically */
+    }
+    
+    .showcase-container {
+        margin: 2rem auto;
+        padding: 0 1rem;
+        gap: 4rem;
+    }
+    
+    .glass-panel {
+        padding: 1.8rem 1.5rem;
+    }
+    
+    .large-title {
+        font-size: 1.8rem;
+    }
 }
 
 /* --- FOOTER --- */
@@ -422,7 +624,7 @@ body {
     border: 1px solid rgba(255, 215, 0, 0.4);
     padding: 0.5rem 1.5rem;
     border-radius: 50px; /* Elegant pill shape */
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
     margin-left: 1rem;
 }
 .nav-right .subscribe-btn:hover {
@@ -467,7 +669,7 @@ footer {
     padding: 0.8rem 2.5rem;
     border-radius: 50px;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
 }
 .subscribe-btn-footer:hover {
     background: #fff;
@@ -497,7 +699,7 @@ footer {
     font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 0.15em;
-    transition: color 0.3s;
+    transition: color 0.5s;
 }
 .footer-links a:hover {
     color: #FFD700;
@@ -521,7 +723,7 @@ footer {
     justify-content: center;
     border: 1px solid rgba(255,255,255,0.1);
     border-radius: 50%;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
     text-decoration: none;
 }
 .footer-socials a:hover {
@@ -880,8 +1082,9 @@ footer {
 
   /* 7. About Page / Full Width Content (Fix Specificity) */
   .reading-container.container-centered {
-    padding: 0 0 4rem 0 !important; /* Full width, no top padding */
-    width: 100%;
+    padding: 0 0 4rem 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   /* COMPACT SUBPAGE SPACING */
@@ -891,6 +1094,29 @@ footer {
       gap: 1.5rem !important;
   }
   
+  /* COMPACT HOMEPAGE SUBSCRIBE */
+  #subscribe-engine {
+      margin-top: 2rem !important;
+      margin-bottom: 2rem !important;
+      padding: 0 1rem !important;
+  }
+  #subscribe-engine .glass-panel {
+      padding: 2rem 1.5rem !important;
+  }
+  #subscribe-engine h2 {
+      font-size: 1.4rem !important;
+      margin-bottom: 0.5rem !important;
+  }
+  #subscribe-engine p {
+      font-size: 0.9rem !important;
+      margin-bottom: 1.5rem !important;
+  }
+  #silent-subscribe-form button {
+      padding: 0.7rem 1.5rem !important;
+      font-size: 0.85rem !important;
+      max-width: 160px !important;
+  }
+
   .archive-divider {
       margin-bottom: 1.5rem !important;
       margin-top: 1rem !important;
@@ -1012,9 +1238,8 @@ footer {
     padding: 1rem 1.5rem;
     /* UPDATED: Removed fixed height to prevent overlap */
     transition: 
-                transform 0.3s ease, 
-                box-shadow 0.3s ease,
-                background 0.3s ease;
+                box-shadow 0.5s ease,
+                background 0.5s ease;
     text-decoration: none !important;
     color: #fff !important;
     display: flex;
@@ -1022,6 +1247,7 @@ footer {
     backface-visibility: hidden;
     transform: translateZ(0);
     -webkit-font-smoothing: antialiased;
+    will-change: transform;
 }
 
 a.solid-glass:hover {
@@ -1056,7 +1282,7 @@ a.solid-glass:hover {
 
 /* Show on Hover */
 /* --- MOUSE FOLLOW GLOW EFFECT --- */
-.card::after, .solid-glass::after {
+.card::after, .solid-glass::after, .glass-panel::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -1071,9 +1297,10 @@ a.solid-glass:hover {
     z-index: 3;
     pointer-events: none; /* Let clicks pass through */
     border-radius: inherit;
+    will-change: opacity;
 }
 
-.card:hover::after, .solid-glass:hover::after {
+.card:hover::after, .solid-glass:hover::after, .glass-panel:hover::after {
     opacity: 1;
 }
 
@@ -1520,7 +1747,7 @@ a.solid-glass:hover {
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
 }
 
 .archive-toggle-btn:hover {
@@ -1581,7 +1808,7 @@ a.solid-glass:hover {
     align-items: center;
     justify-content: center;
     gap: 0.8rem;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border-radius: 50px;
     position: relative;
     overflow: hidden;
@@ -1669,7 +1896,7 @@ a.solid-glass:hover {
     font-size: 0.85rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    transition: all 0.3s ease;
+    transition: all 0.5s ease;
     max-width: 48%;
     text-align: center;
     line-height: 1.4;
@@ -1733,4 +1960,157 @@ a.solid-glass:hover {
     height: 1px; 
     background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent); 
     margin: 4rem 0 2rem;
+}
+
+/* =========================================
+   SUBSCRIBE ENGINE (Homepage)
+   ========================================= */
+#subscribe-engine {
+    margin-top: 8rem;
+    margin-bottom: 4rem;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+#subscribe-engine .glass-panel {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    padding: 3rem 2.5rem;
+}
+
+.accent-line {
+    width: 50px;
+    height: 2px;
+    background: #FFD700;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+#subscribe-engine h2 {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+}
+
+#subscribe-engine p {
+    color: #aaa;
+    margin-bottom: 2.5rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+#subscribe-engine .quote-text {
+    font-size: 1.15rem; /* 0.1rem larger than the 1.05rem p text */
+    letter-spacing: normal; /* Reset from main quote style */
+    line-height: 1.6;
+}
+
+#silent-subscribe-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#silent-subscribe-form input[type="email"] {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 1rem 0.5rem;
+    font-size: 1.1rem;
+    color: #fff;
+    width: 100%;
+    font-family: var(--font-main);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 0;
+    outline: none;
+}
+
+#silent-subscribe-form input[type="email"]:focus {
+    border-bottom-color: #FFD700;
+    box-shadow: 0 1px 0 0 rgba(255, 215, 0, 0.5);
+}
+
+#silent-subscribe-form button {
+    background: #FFD700;
+    color: #000;
+    border: none;
+    padding: 1rem 2rem;
+    font-family: 'Spectral', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    margin-top: 0.5rem;
+    align-self: center;
+    width: 100%;
+    max-width: 200px;
+}
+
+#silent-subscribe-form button:hover {
+    background: #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Success Message State */
+.subscribe-success {
+    position: absolute;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    transform: scale(0.9);
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 220px;
+    text-align: center;
+}
+
+.subscribe-success p {
+    font-size: 1.5rem !important;
+    color: #FFD700 !important;
+    margin: 0 !important;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+/* Active State Classes (Triggered by JS) */
+.glass-panel.submitted #silent-subscribe-form {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}
+
+.glass-panel.submitted .subscribe-success {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: all;
+}
+
+/* =========================================
+   ABOUT PAGE CARD
+   ========================================= */
+.about-card {
+    padding: 4rem 5rem !important;
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+    .about-card {
+        padding: 2rem 1.5rem !important;
+    }
 }

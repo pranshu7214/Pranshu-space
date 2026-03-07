@@ -9,6 +9,7 @@ let animationFrameId = null;
 // Throttle heavy planet math
 const PHYSICS_INTERVAL_MS = 0; // Run at full framerate for maximum smoothness
 let lastPhysicsTime = 0;
+let lastSidebarUpdate = 0;
 
 // Performance Cache to prevent memory leaks
 const physicsCache = {
@@ -32,6 +33,7 @@ function quadraticBezier(p0, p1, p2, t) {
 // Track scroll position (Passive flag makes native scrolling much faster)
 window.addEventListener("scroll", () => {
     targetScrollY = window.scrollY;
+
     if (animationFrameId === null) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
@@ -55,6 +57,14 @@ window.addEventListener("resize", () => {
     }, 150);
 });
 
+// Recalculate metrics after full page load to ensure maxScroll is correct
+window.addEventListener("load", () => {
+    physicsCache.metrics = null;
+    if (animationFrameId === null) {
+        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+    }
+});
+
 function updateCinematicPhysics(now) {
     now = now || performance.now();
     const elapsed = now - lastPhysicsTime;
@@ -67,6 +77,7 @@ function updateCinematicPhysics(now) {
         const saturnEl = document.querySelector(".saturn");
         const quoteSection = document.getElementById("quote-section") || document.querySelector(".page-intro");
         const librarySection = document.getElementById("library-section") || document.querySelector(".content-grid");
+        const showcaseSection = document.getElementById("showcase-gallery");
         const spaceBg = document.querySelector(".space-bg");
         const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)"); 
         const progressBar = document.getElementById('reading-progress');
@@ -75,9 +86,9 @@ function updateCinematicPhysics(now) {
             jupiterEl.style.transition = "opacity 1.5s ease-out";
             requestAnimationFrame(() => jupiterEl.style.opacity = "0.4");
         }
-        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards, progressBar };
+        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, showcaseSection, spaceBg, cards, progressBar };
     }
-    const { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards, progressBar } = physicsCache.elements;
+    const { jupiterEl, saturnEl, quoteSection, librarySection, showcaseSection, spaceBg, cards, progressBar } = physicsCache.elements;
 
     // 2. Initialize Metrics Cache (Runs on load & resize)
     if (!physicsCache.metrics) {
@@ -85,19 +96,21 @@ function updateCinematicPhysics(now) {
         const windowWidth = window.innerWidth;
 
         const quoteTop = quoteSection ? quoteSection.offsetTop : windowHeight * 1.2;
+        const libraryBottom = librarySection ? (librarySection.offsetTop + librarySection.offsetHeight) : (windowHeight * 2.5);
+        const showcaseTop = showcaseSection ? showcaseSection.offsetTop : windowHeight * 3;
         const maxScroll = Math.max(document.documentElement.scrollHeight - windowHeight, 1);
         
         // Pre-calculate celestial paths to avoid heavy math every single frame
         const jupiterPath = {
-            p0: { x: -200, y: windowHeight * 0.1 },
+            p0: { x: -225, y: windowHeight * 0.1 },
             p1: { x: windowWidth * 0.4, y: windowHeight * 1.0 },
-            p2: { x: windowWidth + 200, y: -200 }
+            p2: { x: windowWidth + 100, y: -200 }
         };
 
         const saturnPath = {
-            p0: { x: windowWidth + 100, y: windowHeight * 0.2 },
+            p0: { x: windowWidth + 50, y: windowHeight * 0.2 },
             p1: { x: windowWidth * 0.5, y: windowHeight * 0.9 },
-            p2: { x: -250, y: windowHeight * 0.15 }
+            p2: { x: -200, y: windowHeight * 0.15 }
         };
 
         // Pre-calculate card positions for visibility check (Optimization)
@@ -114,10 +127,17 @@ function updateCinematicPhysics(now) {
             });
         }
 
-        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics };
+        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, libraryBottom, showcaseTop, maxScroll, jupiterPath, saturnPath, cardMetrics };
     }
-    const { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics } = physicsCache.metrics;
+    const { windowHeight, windowWidth, quoteTop, libraryBottom, showcaseTop, maxScroll, jupiterPath, saturnPath, cardMetrics } = physicsCache.metrics;
     
+    // Interpolate scroll value (Smooth feel for desktop, instant for mobile)
+    if (windowWidth < 900) {
+        currentScrollY = targetScrollY;
+    } else {
+        currentScrollY = lerp(currentScrollY, targetScrollY, 0.15); 
+    }
+
     // ========== READING PROGRESS (Efficient Loop Update) ==========
     if (progressBar && maxScroll > 0) {
         const scrollPercent = (currentScrollY / maxScroll) * 100;
@@ -129,9 +149,6 @@ function updateCinematicPhysics(now) {
         animationFrameId = null;
         return;
     }
-
-    // Interpolate scroll value
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.25); // Increased for absolute free scroll feel
 
     // Optimization: Only update scroll-dependent elements if scroll changed
     const isScrolling = Math.abs(currentScrollY - lastScrollY) > 0.01;
@@ -170,8 +187,11 @@ function updateCinematicPhysics(now) {
         });
     }
 
-    // Update sidebar state only when scrolling to save resources
-    if (isScrolling) updateSidebarActiveState();
+    // Update sidebar state (Throttled to 150ms to save CPU/Reflows)
+    if (isScrolling && (now - lastSidebarUpdate > 150)) {
+        updateSidebarActiveState();
+        lastSidebarUpdate = now;
+    }
 
     lastScrollY = currentScrollY;
 
@@ -187,18 +207,19 @@ function updateCinematicPhysics(now) {
     // Only run planet math if the elements exist
     if (jupiterEl && saturnEl) {
         // ========== JUPITER: SLINGSHOT EXIT ==========
-        const jupiterZoneEnd = quoteTop * 1.2; // Slowed down to bridge gap with Saturn
+        const jupiterZoneEnd = showcaseTop || quoteTop * 3.5; // Extended to reach showcase gallery
         const jupiterProgress = Math.min(Math.max(currentScrollY / jupiterZoneEnd, 0), 1);
         
         const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
         const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
     
         const jupiterRotation = (now * 0.005) % 360;
-        const jupiterScale = 0.9 + 0.25 * Math.sin(jupiterProgress * Math.PI); // Restricted zoom
+        // Start bigger (0.8), Mid (1.1), End (0.8)
+        const jupiterScale = 0.8 + 0.4 * Math.sin(jupiterProgress * Math.PI); 
         jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterRotation.toFixed(2)}deg) scale(${jupiterScale.toFixed(2)})`;
     
         // ========== SATURN: CURVED PATH ==========
-        const saturnZoneStart = quoteTop; 
+        const saturnZoneStart = jupiterZoneEnd * 0.85; // Delayed to prevent overlap
         const saturnZoneEnd = maxScroll;
         const saturnZoneHeight = Math.max(saturnZoneEnd - saturnZoneStart, 1);
     
@@ -212,21 +233,34 @@ function updateCinematicPhysics(now) {
     
         const saturnFade = Math.min(saturnProgress * 4, 1); 
         const saturnRotation = -(now * 0.005) % 360; // Rotate opposite direction
-        const saturnScale = 0.9 + 0.25 * Math.sin(saturnProgress * Math.PI); // Zoom in/out effect
+        // Start (1.1), Dip mid (0.9), End (1.1) - Increased overall size
+        const saturnScale = 1.2 - 0.4 * Math.sin(saturnProgress * Math.PI); 
     
         saturnEl.style.opacity = (saturnFade * 0.4).toFixed(2); // Match Jupiter opacity
         saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnRotation.toFixed(2)}deg) scale(${saturnScale.toFixed(2)})`;
     }
 
-    // Engine Loop
-    animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+    // Engine Loop Control: Stop the loop when idle to save CPU, unless planets need to rotate.
+    const isIdle = Math.abs(targetScrollY - currentScrollY) < 0.1;
+
+    if (isIdle) {
+        // Snap to final position
+        currentScrollY = targetScrollY;
+    }
+
+    // Keep animating if planets are visible on desktop, or if we are still scrolling.
+    if ((jupiterEl && saturnEl && windowWidth >= 900) || !isIdle) {
+        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+    } else {
+        animationFrameId = null;
+    }
 }
 
 // ======== CARD GLOW & LIFT EFFECT (No Tilt to prevent blur) ========
 function initCardGlow() {
     if (window.matchMedia("(hover: none)").matches) return; // Ignore on touch
 
-    const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)");
+    const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static), .glass-panel");
     cards.forEach(card => {
         let rect;
         let ticking = false; // Throttling flag for performance
@@ -395,6 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initReadingFeatures(); // Initialize Reading Time & Share
     initBackToTop(); // Initialize Back to Top button
     initMuseumDisplay(); // Initialize Museum Display
+    initSubscribeForm(); // Initialize Homepage Subscribe
 
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
@@ -426,40 +461,15 @@ document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
 });
 
-// ======== READING PROGRESS ========
-function updateReadingProgress() {
-    // Use cached element if available, otherwise query
-    const progressBar = (physicsCache.elements && physicsCache.elements.progressBar) 
-        ? physicsCache.elements.progressBar 
-        : document.getElementById('reading-progress');
-
-    if (progressBar) {
-        let maxScroll;
-        // Use cached metrics if available
-        if (physicsCache.metrics && physicsCache.metrics.maxScroll) {
-            maxScroll = physicsCache.metrics.maxScroll;
-        } else {
-            maxScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        }
-
-        if (maxScroll > 0) {
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
-            const scrollPercent = (scrollTop / maxScroll) * 100;
-            progressBar.style.width = `${scrollPercent}%`;
-        }
-    }
-}
-
 // ======== ARCHIVE COMING SOON TOGGLE ========
 function setupArchiveComingSoon() {
-    // IMPORTANT: Check if we are on the POEMS page by looking for the active class in nav
-    // If we are on Poems page, we DO NOT want to hide the archive!
-    const activePoemLink = document.querySelector('nav a[href="poems.html"].active') || 
-                           document.querySelector('nav a[href="../poems/"].active') ||
-                           document.querySelector('nav a[href="#"].active'); // For self-reference
-
     const archiveSection = document.querySelector('.content-archive');
     if (!archiveSection) return;
+
+    // IMPORTANT: Check if we are on the POEMS page.
+    // If we are on Poems page, we DO NOT want to hide the archive!
+    const activeNavLink = document.querySelector('nav a.active');
+    if (activeNavLink && activeNavLink.textContent.trim() === 'Poems') return;
 
     // 1. Enable Coming Soon Mode (Hides cards via CSS class)
     archiveSection.classList.add('coming-soon-mode');
@@ -554,5 +564,24 @@ function initBackToTop() {
             top: 0,
             behavior: 'smooth'
         });
+    });
+}
+
+// ======== HOMEPAGE SUBSCRIBE ENGINE ========
+function initSubscribeForm() {
+    const form = document.getElementById('silent-subscribe-form');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Simulate processing delay for realism
+        const btn = form.querySelector('button');
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+        
+        setTimeout(() => {
+            const container = form.closest('.glass-panel');
+            if (container) container.classList.add('submitted');
+        }, 800); 
     });
 }
