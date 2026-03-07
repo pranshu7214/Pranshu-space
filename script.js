@@ -9,6 +9,7 @@ let animationFrameId = null;
 // Throttle heavy planet math
 const PHYSICS_INTERVAL_MS = 0; // Run at full framerate for maximum smoothness
 let lastPhysicsTime = 0;
+let lastSidebarUpdate = 0;
 
 // Performance Cache to prevent memory leaks
 const physicsCache = {
@@ -32,6 +33,7 @@ function quadraticBezier(p0, p1, p2, t) {
 // Track scroll position (Passive flag makes native scrolling much faster)
 window.addEventListener("scroll", () => {
     targetScrollY = window.scrollY;
+
     if (animationFrameId === null) {
         animationFrameId = requestAnimationFrame(updateCinematicPhysics);
     }
@@ -55,6 +57,14 @@ window.addEventListener("resize", () => {
     }, 150);
 });
 
+// Recalculate metrics after full page load to ensure maxScroll is correct
+window.addEventListener("load", () => {
+    physicsCache.metrics = null;
+    if (animationFrameId === null) {
+        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+    }
+});
+
 function updateCinematicPhysics(now) {
     now = now || performance.now();
     const elapsed = now - lastPhysicsTime;
@@ -67,6 +77,7 @@ function updateCinematicPhysics(now) {
         const saturnEl = document.querySelector(".saturn");
         const quoteSection = document.getElementById("quote-section") || document.querySelector(".page-intro");
         const librarySection = document.getElementById("library-section") || document.querySelector(".content-grid");
+        const showcaseSection = document.getElementById("showcase-gallery");
         const spaceBg = document.querySelector(".space-bg");
         const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)"); 
         const progressBar = document.getElementById('reading-progress');
@@ -75,9 +86,9 @@ function updateCinematicPhysics(now) {
             jupiterEl.style.transition = "opacity 1.5s ease-out";
             requestAnimationFrame(() => jupiterEl.style.opacity = "0.4");
         }
-        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards, progressBar };
+        physicsCache.elements = { jupiterEl, saturnEl, quoteSection, librarySection, showcaseSection, spaceBg, cards, progressBar };
     }
-    const { jupiterEl, saturnEl, quoteSection, librarySection, spaceBg, cards, progressBar } = physicsCache.elements;
+    const { jupiterEl, saturnEl, quoteSection, librarySection, showcaseSection, spaceBg, cards, progressBar } = physicsCache.elements;
 
     // 2. Initialize Metrics Cache (Runs on load & resize)
     if (!physicsCache.metrics) {
@@ -85,19 +96,21 @@ function updateCinematicPhysics(now) {
         const windowWidth = window.innerWidth;
 
         const quoteTop = quoteSection ? quoteSection.offsetTop : windowHeight * 1.2;
+        const libraryBottom = librarySection ? (librarySection.offsetTop + librarySection.offsetHeight) : (windowHeight * 2.5);
+        const showcaseTop = showcaseSection ? showcaseSection.offsetTop : windowHeight * 3;
         const maxScroll = Math.max(document.documentElement.scrollHeight - windowHeight, 1);
         
         // Pre-calculate celestial paths to avoid heavy math every single frame
         const jupiterPath = {
-            p0: { x: -200, y: windowHeight * 0.1 },
+            p0: { x: -225, y: windowHeight * 0.1 },
             p1: { x: windowWidth * 0.4, y: windowHeight * 1.0 },
-            p2: { x: windowWidth + 200, y: -200 }
+            p2: { x: windowWidth + 100, y: -200 }
         };
 
         const saturnPath = {
-            p0: { x: windowWidth + 100, y: windowHeight * 0.2 },
+            p0: { x: windowWidth + 50, y: windowHeight * 0.2 },
             p1: { x: windowWidth * 0.5, y: windowHeight * 0.9 },
-            p2: { x: -250, y: windowHeight * 0.15 }
+            p2: { x: -200, y: windowHeight * 0.15 }
         };
 
         // Pre-calculate card positions for visibility check (Optimization)
@@ -114,10 +127,17 @@ function updateCinematicPhysics(now) {
             });
         }
 
-        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics };
+        physicsCache.metrics = { windowHeight, windowWidth, quoteTop, libraryBottom, showcaseTop, maxScroll, jupiterPath, saturnPath, cardMetrics };
     }
-    const { windowHeight, windowWidth, quoteTop, maxScroll, jupiterPath, saturnPath, cardMetrics } = physicsCache.metrics;
+    const { windowHeight, windowWidth, quoteTop, libraryBottom, showcaseTop, maxScroll, jupiterPath, saturnPath, cardMetrics } = physicsCache.metrics;
     
+    // Interpolate scroll value (Smooth feel for desktop, instant for mobile)
+    if (windowWidth < 900) {
+        currentScrollY = targetScrollY;
+    } else {
+        currentScrollY = lerp(currentScrollY, targetScrollY, 0.15); 
+    }
+
     // ========== READING PROGRESS (Efficient Loop Update) ==========
     if (progressBar && maxScroll > 0) {
         const scrollPercent = (currentScrollY / maxScroll) * 100;
@@ -129,9 +149,6 @@ function updateCinematicPhysics(now) {
         animationFrameId = null;
         return;
     }
-
-    // Interpolate scroll value
-    currentScrollY = lerp(currentScrollY, targetScrollY, 0.25); // Increased for absolute free scroll feel
 
     // Optimization: Only update scroll-dependent elements if scroll changed
     const isScrolling = Math.abs(currentScrollY - lastScrollY) > 0.01;
@@ -170,8 +187,11 @@ function updateCinematicPhysics(now) {
         });
     }
 
-    // Update sidebar state only when scrolling to save resources
-    if (isScrolling) updateSidebarActiveState();
+    // Update sidebar state (Throttled to 150ms to save CPU/Reflows)
+    if (isScrolling && (now - lastSidebarUpdate > 150)) {
+        updateSidebarActiveState();
+        lastSidebarUpdate = now;
+    }
 
     lastScrollY = currentScrollY;
 
@@ -187,18 +207,19 @@ function updateCinematicPhysics(now) {
     // Only run planet math if the elements exist
     if (jupiterEl && saturnEl) {
         // ========== JUPITER: SLINGSHOT EXIT ==========
-        const jupiterZoneEnd = quoteTop;
+        const jupiterZoneEnd = showcaseTop || quoteTop * 3.5; // Extended to reach showcase gallery
         const jupiterProgress = Math.min(Math.max(currentScrollY / jupiterZoneEnd, 0), 1);
         
         const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
         const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
     
         const jupiterRotation = (now * 0.005) % 360;
-        const jupiterScale = 0.9 + 0.25 * Math.sin(jupiterProgress * Math.PI); // Restricted zoom
+        // Start bigger (0.8), Mid (1.1), End (0.8)
+        const jupiterScale = 0.8 + 0.4 * Math.sin(jupiterProgress * Math.PI); 
         jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterRotation.toFixed(2)}deg) scale(${jupiterScale.toFixed(2)})`;
     
         // ========== SATURN: CURVED PATH ==========
-        const saturnZoneStart = quoteTop; 
+        const saturnZoneStart = jupiterZoneEnd * 0.85; // Delayed to prevent overlap
         const saturnZoneEnd = maxScroll;
         const saturnZoneHeight = Math.max(saturnZoneEnd - saturnZoneStart, 1);
     
@@ -212,21 +233,34 @@ function updateCinematicPhysics(now) {
     
         const saturnFade = Math.min(saturnProgress * 4, 1); 
         const saturnRotation = -(now * 0.005) % 360; // Rotate opposite direction
-        const saturnScale = 0.9 + 0.25 * Math.sin(saturnProgress * Math.PI); // Zoom in/out effect
+        // Start (1.1), Dip mid (0.9), End (1.1) - Increased overall size
+        const saturnScale = 1.2 - 0.4 * Math.sin(saturnProgress * Math.PI); 
     
         saturnEl.style.opacity = (saturnFade * 0.4).toFixed(2); // Match Jupiter opacity
         saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnRotation.toFixed(2)}deg) scale(${saturnScale.toFixed(2)})`;
     }
 
-    // Engine Loop
-    animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+    // Engine Loop Control: Stop the loop when idle to save CPU, unless planets need to rotate.
+    const isIdle = Math.abs(targetScrollY - currentScrollY) < 0.1;
+
+    if (isIdle) {
+        // Snap to final position
+        currentScrollY = targetScrollY;
+    }
+
+    // Keep animating if planets are visible on desktop, or if we are still scrolling.
+    if ((jupiterEl && saturnEl && windowWidth >= 900) || !isIdle) {
+        animationFrameId = requestAnimationFrame(updateCinematicPhysics);
+    } else {
+        animationFrameId = null;
+    }
 }
 
-// ======== 3D CARD TILT EFFECT ========
-function initCardTilt() {
+// ======== CARD GLOW & LIFT EFFECT (No Tilt to prevent blur) ========
+function initCardGlow() {
     if (window.matchMedia("(hover: none)").matches) return; // Ignore on touch
 
-    const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)");
+    const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static), .glass-panel");
     cards.forEach(card => {
         let rect;
         let ticking = false; // Throttling flag for performance
@@ -234,7 +268,10 @@ function initCardTilt() {
         card.addEventListener("mouseenter", () => {
             card.isHovered = true;
             rect = card.getBoundingClientRect();
-            card.style.transition = "transform 0.1s ease-out, height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+            card.style.transition = "transform 0.3s ease-out, height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+            
+            const currentParallax = parseFloat(card.dataset.currentParallax || 0);
+            card.style.transform = `translate3d(0, ${currentParallax - 5}px, 0)`;
         });
 
         card.addEventListener("mousemove", (e) => {
@@ -251,15 +288,6 @@ function initCardTilt() {
                     card.style.setProperty("--mouse-x", `${x}px`);
                     card.style.setProperty("--mouse-y", `${y}px`);
 
-                    // Tilt Logic
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -5; 
-                    const rotateY = ((x - centerX) / centerX) * 5;
-
-                    const currentParallax = parseFloat(card.dataset.currentParallax || 0);
-                    card.style.transform = `perspective(1000px) translate3d(0, ${currentParallax}px, 0) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale(1.02)`;
-                    
                     ticking = false;
                 });
                 ticking = true;
@@ -314,15 +342,94 @@ function updateSidebarActiveState() {
     });
 }
 
+// ======== MUSEUM DISPLAY INTERACTIVITY ========
+function initMuseumDisplay() {
+    const museumItems = document.querySelectorAll('.museum-item');
+    const stageLabel = document.getElementById('stage-label');
+    const stageQuote = document.getElementById('stage-quote');
+    const stageContent = document.querySelector('.stage-content');
+    const stageLink = document.getElementById('stage-link');
+
+    // Exit if we're not on the homepage with the museum display
+    if (!museumItems.length || !stageQuote || !stageContent || !stageLabel || !stageLink) {
+        return;
+    }
+
+    const contentData = {
+        essays: {
+            label: "The Prose",
+            quote: "\"To truly change the world, we must first change<br>the way we view education. The real test is not<br>in marksheets, but in the human beings it produces.\"",
+            link: "essays/",
+            color: "#81C784" // Earth Green
+        },
+        poems: {
+            label: "The Verse",
+            quote: "\"Our eyes connected; oh, it couldn't be more divine,<br>A smile was returned—can I consider that a sign?<br>But how would I talk to her? Shy am I, and that's just fine,<br>It's easy for a letter to ask someone out to dine.\"",
+            link: "poems/",
+            color: "#E57373" // Fire Red
+        },
+        fiction: {
+            label: "The Tales",
+            quote: "\"You signed off on the body count.<br>Math won’t wash off blood.<br>Don't hide behind patriotism now.\"",
+            link: "fiction/",
+            color: "#64B5F6" // Water Blue
+        }
+    };
+
+    let hoverTimeout;
+
+    museumItems.forEach(item => {
+        item.addEventListener('mouseenter', () => {
+            if (window.innerWidth < 900) return; // Don't run on mobile
+
+            // Clear any pending switch to prevent rapid snapping
+            clearTimeout(hoverTimeout);
+
+            hoverTimeout = setTimeout(() => {
+                const currentCategory = stageContent.dataset.activeCategory;
+                const newCategory = item.dataset.category;
+
+                if (currentCategory === newCategory) return; // Don't re-animate for the same item
+
+                museumItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                const data = contentData[newCategory];
+
+                if (data) {
+                    stageContent.classList.add('stage-fade-out');
+
+                    setTimeout(() => {
+                        stageLabel.textContent = data.label;
+                        stageLabel.style.color = data.color;
+                        stageQuote.innerHTML = data.quote;
+                        stageLink.href = data.link;
+                        stageContent.dataset.activeCategory = newCategory;
+                        stageContent.classList.remove('stage-fade-out');
+                    }, 300); // Match CSS transition duration
+                }
+            }, 50); // 50ms delay to debounce accidental hovers
+        });
+    });
+
+    // Set initial state
+    const initialCategory = 'essays';
+    stageContent.dataset.activeCategory = initialCategory;
+    document.querySelector(`.museum-item[data-category="${initialCategory}"]`).classList.add('active');
+    stageLabel.style.color = contentData[initialCategory].color;
+}
+
 // ========== GLOBAL INITIALIZATION & MOBILE MENU ==========
 document.addEventListener("DOMContentLoaded", () => {
     lastPhysicsTime = 0;
     updateCinematicPhysics(performance.now());
-    initCardTilt(); 
+    initCardGlow(); 
     updateSidebarActiveState();
     setupArchiveComingSoon(); // Initialize Archive Toggle
     initReadingFeatures(); // Initialize Reading Time & Share
     initBackToTop(); // Initialize Back to Top button
+    initMuseumDisplay(); // Initialize Museum Display
+    initSubscribeForm(); // Initialize Homepage Subscribe
 
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
@@ -354,40 +461,15 @@ document.addEventListener('contextmenu', function(e) {
     e.preventDefault();
 });
 
-// ======== READING PROGRESS ========
-function updateReadingProgress() {
-    // Use cached element if available, otherwise query
-    const progressBar = (physicsCache.elements && physicsCache.elements.progressBar) 
-        ? physicsCache.elements.progressBar 
-        : document.getElementById('reading-progress');
-
-    if (progressBar) {
-        let maxScroll;
-        // Use cached metrics if available
-        if (physicsCache.metrics && physicsCache.metrics.maxScroll) {
-            maxScroll = physicsCache.metrics.maxScroll;
-        } else {
-            maxScroll = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        }
-
-        if (maxScroll > 0) {
-            const scrollTop = window.scrollY || document.documentElement.scrollTop;
-            const scrollPercent = (scrollTop / maxScroll) * 100;
-            progressBar.style.width = `${scrollPercent}%`;
-        }
-    }
-}
-
 // ======== ARCHIVE COMING SOON TOGGLE ========
 function setupArchiveComingSoon() {
-    // IMPORTANT: Check if we are on the POEMS page by looking for the active class in nav
-    // If we are on Poems page, we DO NOT want to hide the archive!
-    const activePoemLink = document.querySelector('nav a[href="poems.html"].active') || 
-                           document.querySelector('nav a[href="../poems/"].active') ||
-                           document.querySelector('nav a[href="#"].active'); // For self-reference
-
     const archiveSection = document.querySelector('.content-archive');
     if (!archiveSection) return;
+
+    // IMPORTANT: Check if we are on the POEMS page.
+    // If we are on Poems page, we DO NOT want to hide the archive!
+    const activeNavLink = document.querySelector('nav a.active');
+    if (activeNavLink && activeNavLink.textContent.trim() === 'Poems') return;
 
     // 1. Enable Coming Soon Mode (Hides cards via CSS class)
     archiveSection.classList.add('coming-soon-mode');
@@ -482,5 +564,24 @@ function initBackToTop() {
             top: 0,
             behavior: 'smooth'
         });
+    });
+}
+
+// ======== HOMEPAGE SUBSCRIBE ENGINE ========
+function initSubscribeForm() {
+    const form = document.getElementById('silent-subscribe-form');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Simulate processing delay for realism
+        const btn = form.querySelector('button');
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+        
+        setTimeout(() => {
+            const container = form.closest('.glass-panel');
+            if (container) container.classList.add('submitted');
+        }, 800); 
     });
 }
