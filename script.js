@@ -268,7 +268,7 @@ function initCardGlow() {
         card.addEventListener("mouseenter", () => {
             card.isHovered = true;
             rect = card.getBoundingClientRect();
-            card.style.transition = "transform 0.3s ease-out, height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+            card.style.transition = "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s ease, border-color 0.6s ease, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
             
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax - 5}px, 0)`;
@@ -296,7 +296,7 @@ function initCardGlow() {
 
         card.addEventListener("mouseleave", () => {
             card.isHovered = false;
-            card.style.transition = "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+            card.style.transition = "transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s ease, border-color 0.6s ease, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax}px, 0)`;
 
@@ -304,7 +304,7 @@ function initCardGlow() {
             if (card.resetTimeout) clearTimeout(card.resetTimeout);
             card.resetTimeout = setTimeout(() => {
                 if (!card.isHovered) {
-                    card.style.transition = "height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+                    card.style.transition = "transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
                 }
             }, 600);
         });
@@ -569,19 +569,49 @@ function initBackToTop() {
 
 // ======== HOMEPAGE SUBSCRIBE ENGINE ========
 function initSubscribeForm() {
-    const form = document.getElementById('silent-subscribe-form');
-    if (!form) return;
+    const forms = document.querySelectorAll('form[target="hidden_iframe"]');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', (e) => {
+            // Find the bot trap inside THIS specific form
+            const botTrap = form.querySelector('input[name="b_name"]');
+            
+            // Honeypot Check: If the hidden field has a value, it's a bot.
+            if (botTrap && botTrap.value !== "") {
+                e.preventDefault(); // Stop the actual submission
+                return;
+            }
+            
+            // 1. Button Text Swap (Premium Feel)
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) btn.innerHTML = "Reserving...";
 
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        // Simulate processing delay for realism
-        const btn = form.querySelector('button');
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-        
-        setTimeout(() => {
-            const container = form.closest('.glass-panel');
-            if (container) container.classList.add('submitted');
-        }, 800); 
+            // 2. Cinematic Fade Out
+            form.style.transition = 'opacity 0.4s ease';
+            form.style.opacity = '0';
+
+            // 3. Wait for fade out, then swap
+            setTimeout(() => {
+                form.style.display = 'none';
+                
+                const successMessage = form.nextElementSibling;
+                if (successMessage) {
+                    const isFooter = form.classList.contains('footer-subscribe-form');
+                    successMessage.style.display = isFooter ? 'block' : 'flex';
+                    
+                    // Prepare for Fade In
+                    successMessage.style.opacity = '0';
+                    successMessage.style.transition = 'opacity 0.8s ease';
+                    successMessage.style.position = 'relative';
+                    successMessage.style.transform = 'scale(1)';
+                    
+                    // Force Reflow
+                    void successMessage.offsetWidth;
+                    
+                    // Execute Fade In
+                    successMessage.style.opacity = '1';
+                }
+            }, 400);
+        });
     });
 }

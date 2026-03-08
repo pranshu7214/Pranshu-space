@@ -50,7 +50,7 @@
 
     <nav class="nav-right desktop-only">
       <a href="../about/">About</a>
-      <a href="https://pranshuspace.substack.com/subscribe" target="_blank" rel="noopener noreferrer" class="subscribe-btn">Subscribe</a>
+      <a href="#footer" class="subscribe-btn">Subscribe</a>
     </nav>
 
     <div class="menu-toggle" role="button" aria-label="Toggle Navigation" tabindex="0"><i class="fa-solid fa-bars"></i></div>
@@ -62,7 +62,7 @@
       <a href="../poems/" class="active">Poems</a>
       <a href="../fiction/">Fiction</a>
       <a href="../about/">About</a>
-      <a href="https://pranshuspace.substack.com/subscribe" target="_blank" class="mobile-subscribe-btn">Subscribe</a>
+      <a href="#footer" class="mobile-subscribe-btn">Subscribe</a>
   </div>
 
   <main>
@@ -168,10 +168,18 @@
     </div>
   </main>
 
-  <footer>
+  <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+  <footer id="footer">
     <div class="footer-catch">
       <p>Step inside. I'll leave my new words directly on your desk.</p>
-      <a href="https://pranshuspace.substack.com/subscribe" target="_blank" rel="noopener noreferrer" class="subscribe-btn-footer">Subscribe</a>
+      <form class="footer-subscribe-form" action="https://eocampaign1.com/form/a530cd3a-1aba-11f1-a0cc-abf3cee050cb" method="POST" target="hidden_iframe">
+        <input type="text" name="b_name" class="bot-trap" tabindex="-1" autocomplete="off" style="display:none !important; position:absolute; left:-9999px;">
+        <input type="email" name="field_0" placeholder="Your email address..." required>
+        <button type="submit">Join <span class="btn-arrow">→</span></button>
+      </form>
+      <div class="footer-success-message" style="display: none;">
+        <p>"The door is unlocked. A seat is saved for you."</p>
+      </div>
     </div>
     <div class="footer-bottom">
       <p class="copyright">© 2026 Pranshu Gupta. All rights reserved.</p>
