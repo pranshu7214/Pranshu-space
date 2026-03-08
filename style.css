@@ -661,23 +661,53 @@ footer {
     letter-spacing: 0.05em;
     max-width: 350px; /* Constrain width */
 }
-.subscribe-btn-footer {
-    display: inline-block;
-    color: #000;
-    background: #FFD700;
-    text-decoration: none;
-    font-size: 0.85rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 0.7rem 2.5rem;
-    border-radius: 50px;
-    font-weight: 600;
-    transition: all 0.5s ease;
+.footer-subscribe-form {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    align-items: center;
 }
-.subscribe-btn-footer:hover {
+.footer-subscribe-form input[type="email"] {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    border-radius: 4px;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 200px;
+}
+.footer-subscribe-form input[type="email"]:focus {
+    border-color: #FFD700;
+}
+.footer-subscribe-form button {
+    background: #FFD700;
+    color: #000;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+.footer-subscribe-form button:hover {
     background: #fff;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
     transform: translateY(-2px);
+}
+.footer-success-message {
+    margin-top: 1rem;
+}
+.footer-success-message p {
+    color: #FFD700;
+    font-style: italic;
+    font-size: 1rem;
+    margin-bottom: 0; /* Override generic p margin */
 }
 
 /* Right column container */
@@ -822,14 +852,18 @@ footer {
     margin-bottom: 0.5rem !important;
     max-width: none;
   }
-  
-  .subscribe-btn-footer {
-    width: auto !important;
-    text-align: center !important;
-    padding: 0.4rem 1.5rem !important;
-    font-size: 0.6rem !important;
+  .footer-subscribe-form {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.8rem;
   }
-
+  .footer-subscribe-form input[type="email"] {
+    width: 100%;
+  }
+  .footer-subscribe-form button {
+    padding: 0.5rem 1.5rem !important;
+    font-size: 0.7rem !important;
+  }
   /* 2. Fix the Missing Links (Essays/Poems/etc) */
   .footer-right {
     width: 100%;
@@ -1090,8 +1124,9 @@ footer {
   }
 
   /* 7. About Page / Full Width Content (Fix Specificity) */
+    /* This rule makes all reading pages (essays, poems, about) go edge-to-edge on mobile */
   .reading-container.container-centered {
-    padding: 0 0 4rem 0 !important;
+    padding: 100px 0 4rem 0 !important; /* Consistent top padding */
     width: 100% !important;
     max-width: 100% !important;
   }
@@ -1507,7 +1542,7 @@ a.solid-glass:hover {
         padding: 2rem 1.5rem; /* Add padding to sidebar so it doesn't touch edges */
     }
     .reading-main {
-        padding: 2rem 1.2rem !important; /* Internal padding for text */
+        padding: 2rem 1.5rem !important; /* Consistent internal padding */
         width: 100% !important;
         max-width: none !important;
         border-radius: 0 !important;
@@ -2128,21 +2163,4 @@ a.solid-glass:hover {
     margin: 0 auto;
     width: 100%;
     line-height: 1.8;
-}
-
-@media (max-width: 768px) {
-    .reading-container.container-centered {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-        width: 100% !important;
-    }
-
-    .about-card {
-        padding: 2rem 1.5rem !important;
-        margin: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        border: none !important;
-        border-radius: 0 !important;
-    }
 }
