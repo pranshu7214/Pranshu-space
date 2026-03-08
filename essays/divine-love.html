@@ -76,9 +76,11 @@
 
     <div class="reading-container reading-layout">
       
-      <aside class="reading-sidebar">
-        <div id="sidebar-reading-time" class="sidebar-reading-time"></div>
-        <h3 class="sidebar-title">In This Essay</h3>
+      <div class="mobile-reading-time"></div>
+      
+      <!-- Mobile "In This Essay" (Visible only on mobile, Order 0) -->
+      <div class="mobile-toc-card">
+        <h3 class="sidebar-title" style="color: #FFD700;">In This Essay</h3>
         <ul class="sidebar-list">
           <li><a href="#krishna">What is Love?</a></li>
           <li><a href="#vedanta">The Binding Force</a></li>
@@ -88,6 +90,23 @@
           <li><a href="#freedom">Highest Freedom</a></li>
           <li><a href="#message">Final Message</a></li>
         </ul>
+      </div>
+
+      <aside class="reading-sidebar">
+        <div id="sidebar-reading-time" class="sidebar-reading-time"></div>
+        
+        <div class="desktop-only-toc">
+            <h3 class="sidebar-title">In This Essay</h3>
+            <ul class="sidebar-list">
+            <li><a href="#krishna">What is Love?</a></li>
+            <li><a href="#vedanta">The Binding Force</a></li>
+            <li><a href="#attachment">Attachment vs Love</a></li>
+            <li><a href="#oneness">From Self to Oneness</a></li>
+            <li><a href="#self-love">Spiritual Self-Love</a></li>
+            <li><a href="#freedom">Highest Freedom</a></li>
+            <li><a href="#message">Final Message</a></li>
+            </ul>
+        </div>
         
         <h3 class="sidebar-title" style="margin-top: 2rem;">More Essays</h3>
         <ul class="sidebar-list">
@@ -245,7 +264,7 @@
           <p>To deeply understand love, don’t try to remember everything you’ve read. Instead, try to feel it.</p>
           <p>Sit alone. Be still. Observe your emotions. Next time you’re with someone you love, just watch. If fear arises, let it. If joy floods in, let it. Don’t try to change anything — just witness it.</p>
           <p>Let it flow. Let it speak. Let it teach. Sit and observe… with love.</p>
-          <p>All the best. You’re already on the path.</p>
+          <div class="poem-closing">All the best. You’re already on the path.</div>
 
           <hr style="border: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent); margin: 4rem 0 2rem;">
           

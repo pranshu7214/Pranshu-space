@@ -234,7 +234,7 @@ function updateCinematicPhysics(now) {
         const saturnFade = Math.min(saturnProgress * 4, 1); 
         const saturnRotation = -(now * 0.005) % 360; // Rotate opposite direction
         // Start (1.1), Dip mid (0.9), End (1.1) - Increased overall size
-        const saturnScale = 1.2 - 0.4 * Math.sin(saturnProgress * Math.PI); 
+        const saturnScale = 1.2 - 0.2 * Math.sin(saturnProgress * Math.PI); 
     
         saturnEl.style.opacity = (saturnFade * 0.4).toFixed(2); // Match Jupiter opacity
         saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnRotation.toFixed(2)}deg) scale(${saturnScale.toFixed(2)})`;
@@ -313,14 +313,9 @@ function initCardGlow() {
 
 // ======== SIDEBAR SCROLL SPY ========
 function updateSidebarActiveState() {
-    if (!physicsCache.sidebar) {
-        physicsCache.sidebar = {
-            sections: document.querySelectorAll('.reading-text h3[id], .reading-text h2[id]'),
-            links: document.querySelectorAll('.sidebar-list a')
-        };
-    }
-    const { sections, links } = physicsCache.sidebar;
-
+    const sections = document.querySelectorAll('.reading-text h3[id], .reading-text h2[id]');
+    const links = document.querySelectorAll('.sidebar-list a');
+    
     if (sections.length === 0) return;
 
     let currentSectionId = '';
@@ -363,7 +358,7 @@ function initMuseumDisplay() {
             color: "#81C784" // Earth Green
         },
         poems: {
-            label: "The Verse",
+            label: "The Verses",
             quote: "\"Our eyes connected; oh, it couldn't be more divine,<br>A smile was returned—can I consider that a sign?<br>But how would I talk to her? Shy am I, and that's just fine,<br>It's easy for a letter to ask someone out to dine.\"",
             link: "poems/",
             color: "#E57373" // Fire Red
@@ -503,21 +498,54 @@ function setupArchiveComingSoon() {
 function initReadingFeatures() {
     // 1. Calculate Reading Time
     const articleText = document.querySelector('.reading-text');
-    const timeDisplay = document.getElementById('sidebar-reading-time');
+    const timeDisplays = document.querySelectorAll('.sidebar-reading-time, .mobile-reading-time');
     
-    if (articleText && timeDisplay) {
+    if (articleText && timeDisplays.length > 0) {
         const text = articleText.innerText;
         const wpm = 200; // Average reading speed
         const words = text.trim().split(/\s+/).length;
         const time = Math.ceil(words / wpm);
-        timeDisplay.innerHTML = `<i class="fa-regular fa-clock"></i> ${time} min read`;
+        timeDisplays.forEach(display => {
+            display.innerHTML = `<i class="fa-regular fa-clock"></i> ${time} min read`;
+        });
     }
 
     // 2. Share Button Logic
     const shareBtn = document.getElementById('sidebar-share-btn');
     if (shareBtn) {
-        shareBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(window.location.href).then(() => {
+        shareBtn.addEventListener('click', async () => {
+            const url = window.location.href;
+            let success = false;
+
+            // 1. Try Modern API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                try {
+                    await navigator.clipboard.writeText(url);
+                    success = true;
+                } catch (err) {
+                    // console.log('Clipboard API failed, trying fallback...');
+                }
+            }
+
+            // 2. Fallback for Mobile/Non-Secure Contexts
+            if (!success) {
+                try {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = url;
+                    textArea.style.position = "fixed"; // Avoid scrolling to bottom
+                    textArea.style.left = "-9999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    success = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                } catch (err) {
+                    // console.error('Fallback failed', err);
+                }
+            }
+
+            // 3. Show Feedback
+            if (success) {
                 const originalHTML = shareBtn.innerHTML;
                 shareBtn.innerHTML = '<i class="fa-solid fa-check"></i> Link Copied';
                 shareBtn.classList.add('copied');
@@ -525,7 +553,7 @@ function initReadingFeatures() {
                     shareBtn.innerHTML = originalHTML;
                     shareBtn.classList.remove('copied');
                 }, 2000);
-            });
+            }
         });
     }
 }
@@ -586,32 +614,34 @@ function initSubscribeForm() {
             const btn = form.querySelector('button[type="submit"]');
             if (btn) btn.innerHTML = "Reserving...";
 
-            // 2. Cinematic Fade Out
-            form.style.transition = 'opacity 0.4s ease';
-            form.style.opacity = '0';
-
-            // 3. Wait for fade out, then swap
+            // 2. Cinematic Fade Out (Delayed)
             setTimeout(() => {
-                form.style.display = 'none';
-                
-                const successMessage = form.nextElementSibling;
-                if (successMessage) {
-                    const isFooter = form.classList.contains('footer-subscribe-form');
-                    successMessage.style.display = isFooter ? 'block' : 'flex';
+                form.style.transition = 'opacity 0.4s ease';
+                form.style.opacity = '0';
+
+                // 3. Wait for fade out, then swap
+                setTimeout(() => {
+                    form.style.display = 'none';
                     
-                    // Prepare for Fade In
-                    successMessage.style.opacity = '0';
-                    successMessage.style.transition = 'opacity 0.8s ease';
-                    successMessage.style.position = 'relative';
-                    successMessage.style.transform = 'scale(1)';
-                    
-                    // Force Reflow
-                    void successMessage.offsetWidth;
-                    
-                    // Execute Fade In
-                    successMessage.style.opacity = '1';
-                }
-            }, 400);
+                    const successMessage = form.nextElementSibling;
+                    if (successMessage) {
+                        const isFooter = form.classList.contains('footer-subscribe-form');
+                        successMessage.style.display = isFooter ? 'block' : 'flex';
+                        
+                        // Prepare for Fade In
+                        successMessage.style.opacity = '0';
+                        successMessage.style.transition = 'opacity 0.8s ease';
+                        successMessage.style.position = 'relative';
+                        successMessage.style.transform = 'scale(1)';
+                        
+                        // Force Reflow
+                        void successMessage.offsetWidth;
+                        
+                        // Execute Fade In
+                        successMessage.style.opacity = '1';
+                    }
+                }, 400);
+            }, 1000);
         });
     });
 }
