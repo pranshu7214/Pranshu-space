@@ -856,9 +856,12 @@ footer {
     flex-direction: column;
     width: 100%;
     gap: 0.8rem;
+    align-items: center;
   }
   .footer-subscribe-form input[type="email"] {
-    width: 100%;
+    width: 85%;
+    max-width: 300px;
+    font-size: 0.8rem !important;
   }
   .footer-subscribe-form button {
     padding: 0.5rem 1.5rem !important;
@@ -933,7 +936,7 @@ footer {
 
   /* Adjust Logo for Mobile Ribbon */
   .nav-logo img { 
-      height: 75px; margin-top: 12px; /* Slightly larger mobile logo */
+      height: 75px; margin-top: 18px; /* Slightly larger mobile logo */
       filter: none; transform: none; 
   }
 
@@ -1177,6 +1180,33 @@ footer {
       background: rgba(10, 15, 20, 0.5) !important;
       border-color: rgba(255, 255, 255, 0.05) !important;
   }
+
+  /* Disable Share & Read Next Hovers */
+  .sidebar-share-btn:not(.copied):hover,
+  .read-next-btn:hover {
+      transform: none !important;
+      box-shadow: none !important;
+      color: #e0e0e0 !important;
+      border-color: rgba(255, 255, 255, 0.15) !important;
+      letter-spacing: 0.15em !important;
+  }
+  .sidebar-share-btn:not(.copied):hover i { transform: none !important; opacity: 1 !important; }
+  .sidebar-share-btn:not(.copied):hover::after { opacity: 0 !important; }
+
+  /* Disable Archive Card Hover */
+  .card-simple:hover {
+      transform: none !important;
+      background: rgba(10, 15, 20, 0.5) !important;
+  }
+
+  /* Disable Sidebar Link Hover Effects */
+  .sidebar-list a:hover {
+      padding-left: 0 !important;
+  }
+  .sidebar-list a:not(.active-link):hover {
+      color: #aaa !important;
+      text-shadow: none !important;
+  }
 }
 
 /* --- ABOUT PAGE --- */
@@ -1248,7 +1278,6 @@ footer {
 /* Mobile adjustment for quote box */
 @media (max-width: 600px) {
     .quote-glass { padding: 2rem 1.5rem; }
-    .page-title { font-size: 1.3rem; } /* Smaller reading room title */
 }
 
 .page-title {
@@ -1540,14 +1569,17 @@ a.solid-glass:hover {
         position: static; 
         margin-top: 0;
         padding: 2rem 1.5rem; /* Add padding to sidebar so it doesn't touch edges */
+        order: 2; /* Move sidebar to bottom on mobile */
     }
     .reading-main {
         padding: 2rem 1.5rem !important; /* Consistent internal padding */
         width: 100% !important;
         max-width: none !important;
         border-radius: 0 !important;
-        border: none !important;
+        border: 1px solid rgba(255, 215, 0, 0.5) !important;
         margin: 0 !important;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.1) !important;
+        order: 1; /* Ensure content appears first */
     }
     .reading-text, .poem-content {
         font-size: 0.95rem !important;
@@ -2005,7 +2037,8 @@ a.solid-glass:hover {
     margin-bottom: 2.5rem;
 }
 
-.poem-content .poem-closing {
+.poem-content .poem-closing,
+.reading-text .poem-closing {
     font-style: italic; 
     color: #FFD700;
     margin-top: 3rem;
@@ -2163,4 +2196,99 @@ a.solid-glass:hover {
     margin: 0 auto;
     width: 100%;
     line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+    .reading-container.container-centered {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 100% !important;
+    }
+
+    .about-card {
+        padding: 2rem 1.5rem !important;
+        width: 100% !important;
+        max-width: none !important;
+        border-radius: 0 !important;
+        border: 1px solid rgba(255, 215, 0, 0.5) !important;
+        margin: 0 !important;
+        box-shadow: 0 0 20px rgba(255, 215, 0, 0.1) !important;
+        min-width: 100% !important;
+    }
+}
+
+/* Disable hover effects on subpage index cards */
+.content-featured .card-anchor:hover,
+.content-archive .card-simple:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.content-featured .card-anchor:hover {
+    background: rgba(10, 15, 20, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.05); /* Reset from theme color */
+}
+
+/* Re-apply the theme-specific left border that gets overridden by border-color */
+.content-featured .card-anchor.earth-theme:hover { border-left-color: var(--color-earth); }
+.content-featured .card-anchor.fire-theme:hover { border-left-color: var(--color-fire); }
+.content-featured .card-anchor.water-theme:hover { border-left-color: var(--color-water); }
+
+.content-archive .card-simple:hover {
+    background: rgba(10, 15, 20, 0.5) !important; /* Reset to its base color */
+}
+
+.content-featured .card-anchor:hover .item-excerpt {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    margin-top: 0 !important;
+}
+
+.content-featured .card-anchor:hover::after,
+.content-archive .card-simple:hover::after {
+    opacity: 0 !important;
+}
+
+/* --- MOBILE TOC (Divine Love Page) --- */
+.mobile-toc-card {
+    display: none; /* Hidden on Desktop */
+}
+
+@media (max-width: 900px) {
+    .mobile-toc-card {
+        display: block;
+        width: 100%;
+        padding: 2rem 1.5rem;
+        background: rgba(10, 15, 20, 0.6);
+        border: 1px solid rgba(255, 215, 0, 0.3);
+        margin-bottom: 2rem;
+        /* Order 0 by default, so it sits above Content (Order 1) and Sidebar (Order 2) */
+    }
+    .desktop-only-toc {
+        display: none;
+    }
+}
+
+/* --- MOBILE READING TIME --- */
+.mobile-reading-time { display: none; }
+
+@media (max-width: 900px) {
+    .mobile-reading-time {
+        display: block;
+        color: #FFD700;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        opacity: 0.9;
+        order: -5; /* Ensure it appears at the very top */
+        width: 100%;
+        padding: 0 1.5rem;
+    }
+    .sidebar-reading-time {
+        display: none !important;
+    }
+    .page-title { 
+        font-size: 1.2rem !important; /* Enforce smaller size for mobile */
+    }
 }
