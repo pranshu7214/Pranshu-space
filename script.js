@@ -268,7 +268,7 @@ function initCardGlow() {
         card.addEventListener("mouseenter", () => {
             card.isHovered = true;
             rect = card.getBoundingClientRect();
-            card.style.transition = "transform 0.3s ease-out, height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+            card.style.transition = "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s ease, border-color 0.6s ease, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
             
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax - 5}px, 0)`;
@@ -296,7 +296,7 @@ function initCardGlow() {
 
         card.addEventListener("mouseleave", () => {
             card.isHovered = false;
-            card.style.transition = "transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+            card.style.transition = "transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s ease, border-color 0.6s ease, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax}px, 0)`;
 
@@ -304,7 +304,7 @@ function initCardGlow() {
             if (card.resetTimeout) clearTimeout(card.resetTimeout);
             card.resetTimeout = setTimeout(() => {
                 if (!card.isHovered) {
-                    card.style.transition = "height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s";
+                    card.style.transition = "height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
                 }
             }, 600);
         });
