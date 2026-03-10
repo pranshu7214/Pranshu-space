@@ -414,6 +414,41 @@ function initMuseumDisplay() {
     stageLabel.style.color = contentData[initialCategory].color;
 }
 
+// ======== SUBSCRIBE SCROLL & FOCUS ========
+function initSubscribeScroll() {
+    const subscribeBtns = document.querySelectorAll('.subscribe-btn, .mobile-subscribe-btn');
+    
+    subscribeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // 1. Check for Homepage Subscribe Section
+            const homeSubscribeSection = document.getElementById('subscribe-engine');
+            const homeInput = document.querySelector('#silent-subscribe-form input[type="email"]');
+            
+            // 2. Check for Footer (Fallback for other pages)
+            const footer = document.getElementById('footer');
+            const footerInput = document.querySelector('.footer-subscribe-form input[type="email"]');
+
+            if (homeSubscribeSection && homeInput) {
+                // Homepage: Scroll to the dedicated center card
+                homeSubscribeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => homeInput.focus({ preventScroll: true }), 500);
+            } else if (footer && footerInput) {
+                // Other Pages: Scroll to footer
+                footer.scrollIntoView({ behavior: 'smooth' });
+                setTimeout(() => footerInput.focus({ preventScroll: true }), 500);
+            }
+            
+            // Close mobile menu if it's open after clicking subscribe
+            const mobileMenu = document.getElementById("mobileMenu");
+            if (mobileMenu && mobileMenu.style.display === "flex") {
+                mobileMenu.style.display = "none";
+            }
+        });
+    });
+}
+
 // ========== GLOBAL INITIALIZATION & MOBILE MENU ==========
 document.addEventListener("DOMContentLoaded", () => {
     lastPhysicsTime = 0;
@@ -425,6 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initBackToTop(); // Initialize Back to Top button
     initMuseumDisplay(); // Initialize Museum Display
     initSubscribeForm(); // Initialize Homepage Subscribe
+    initSubscribeScroll(); // Initialize Subscribe Scroll & Focus
 
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
@@ -460,11 +496,6 @@ document.addEventListener('contextmenu', function(e) {
 function setupArchiveComingSoon() {
     const archiveSection = document.querySelector('.content-archive');
     if (!archiveSection) return;
-
-    // IMPORTANT: Check if we are on the POEMS page.
-    // If we are on Poems page, we DO NOT want to hide the archive!
-    const activeNavLink = document.querySelector('nav a.active');
-    if (activeNavLink && activeNavLink.textContent.trim() === 'Poems') return;
 
     // 1. Enable Coming Soon Mode (Hides cards via CSS class)
     archiveSection.classList.add('coming-soon-mode');
