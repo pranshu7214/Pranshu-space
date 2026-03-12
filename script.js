@@ -7,15 +7,17 @@ let lastScrollY = currentScrollY;
 let animationFrameId = null;
 
 // Throttle heavy planet math
-const PHYSICS_INTERVAL_MS = 0; // Run at full framerate for maximum smoothness
+const PHYSICS_INTERVAL_MS = 16; // Run at ~60fps for performance/battery balance
 let lastPhysicsTime = 0;
 let lastSidebarUpdate = 0;
+
+const CARD_SELECTOR = ".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static), .glass-panel";
 
 // Performance Cache to prevent memory leaks
 const physicsCache = {
     elements: null,
     metrics: null,
-    sidebar: null,
+    sidebarElements: null,
     progressBar: null
 };
 
@@ -79,7 +81,7 @@ function updateCinematicPhysics(now) {
         const librarySection = document.getElementById("library-section") || document.querySelector(".content-grid");
         const showcaseSection = document.getElementById("showcase-gallery");
         const spaceBg = document.querySelector(".space-bg");
-        const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)"); 
+        const cards = document.querySelectorAll(CARD_SELECTOR);
         const progressBar = document.getElementById('reading-progress');
 
         if (jupiterEl) {
@@ -260,16 +262,14 @@ function updateCinematicPhysics(now) {
 function initCardGlow() {
     if (window.matchMedia("(hover: none)").matches) return; // Ignore on touch
 
-    const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static), .glass-panel");
+    const cards = document.querySelectorAll(CARD_SELECTOR);
     cards.forEach(card => {
         let rect;
         let ticking = false; // Throttling flag for performance
 
         card.addEventListener("mouseenter", () => {
             card.isHovered = true;
-            rect = card.getBoundingClientRect();
-            card.style.transition = "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s ease, border-color 0.6s ease, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
-            
+            rect = card.getBoundingClientRect();            
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax - 5}px, 0)`;
         });
@@ -277,14 +277,9 @@ function initCardGlow() {
         card.addEventListener("mousemove", (e) => {
             if (!ticking) {
                 window.requestAnimationFrame(() => {
-                    // Optimization: Use cached rect from mouseenter to avoid layout thrashing
                     if (!rect) rect = card.getBoundingClientRect();
-                    
-                    // Calculate relative position for Glow & Tilt
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-                    
-                    // Update CSS variables for the Glow Effect
                     card.style.setProperty("--mouse-x", `${x}px`);
                     card.style.setProperty("--mouse-y", `${y}px`);
 
@@ -296,25 +291,21 @@ function initCardGlow() {
 
         card.addEventListener("mouseleave", () => {
             card.isHovered = false;
-            card.style.transition = "transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s ease, border-color 0.6s ease, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax}px, 0)`;
-
-            // Remove transform transition after tilt reset so parallax isn't laggy
-            if (card.resetTimeout) clearTimeout(card.resetTimeout);
-            card.resetTimeout = setTimeout(() => {
-                if (!card.isHovered) {
-                    card.style.transition = "transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.7s, border-color 0.7s, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
-                }
-            }, 600);
         });
     });
 }
 
 // ======== SIDEBAR SCROLL SPY ========
 function updateSidebarActiveState() {
-    const sections = document.querySelectorAll('.reading-text h3[id], .reading-text h2[id]');
-    const links = document.querySelectorAll('.sidebar-list a');
+    if (!physicsCache.sidebarElements) {
+        const sections = document.querySelectorAll('.reading-text h3[id], .reading-text h2[id]');
+        const links = document.querySelectorAll('.sidebar-list a');
+        physicsCache.sidebarElements = { sections, links };
+    }
+    
+    const { sections, links } = physicsCache.sidebarElements;
     
     if (sections.length === 0) return;
 
