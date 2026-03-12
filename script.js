@@ -6,16 +6,15 @@ let targetScrollY = window.scrollY;
 let lastScrollY = currentScrollY;
 let animationFrameId = null;
 
-// Throttle heavy planet math
-const PHYSICS_INTERVAL_MS = 0; // Run at full framerate for maximum smoothness
-let lastPhysicsTime = 0;
 let lastSidebarUpdate = 0;
+
+const CARD_SELECTOR = ".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static), .glass-panel";
 
 // Performance Cache to prevent memory leaks
 const physicsCache = {
     elements: null,
     metrics: null,
-    sidebar: null,
+    sidebarElements: null,
     progressBar: null
 };
 
@@ -67,9 +66,6 @@ window.addEventListener("load", () => {
 
 function updateCinematicPhysics(now) {
     now = now || performance.now();
-    const elapsed = now - lastPhysicsTime;
-    const shouldRunHeavyStep = elapsed >= PHYSICS_INTERVAL_MS || lastPhysicsTime === 0;
-    if (shouldRunHeavyStep) lastPhysicsTime = now;
 
     // 1. Initialize Elements Cache (Runs only once)
     if (!physicsCache.elements) {
@@ -79,7 +75,7 @@ function updateCinematicPhysics(now) {
         const librarySection = document.getElementById("library-section") || document.querySelector(".content-grid");
         const showcaseSection = document.getElementById("showcase-gallery");
         const spaceBg = document.querySelector(".space-bg");
-        const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static)"); 
+        const cards = document.querySelectorAll(CARD_SELECTOR);
         const progressBar = document.getElementById('reading-progress');
 
         if (jupiterEl) {
@@ -101,16 +97,18 @@ function updateCinematicPhysics(now) {
         const maxScroll = Math.max(document.documentElement.scrollHeight - windowHeight, 1);
         
         // Pre-calculate celestial paths to avoid heavy math every single frame
+        // JUPITER: THE ORBITAL GLIDE. Stays comfortably within viewport.
         const jupiterPath = {
-            p0: { x: -225, y: windowHeight * 0.1 },
-            p1: { x: windowWidth * 0.4, y: windowHeight * 1.0 },
-            p2: { x: windowWidth + 100, y: -200 }
+            p0: { x: -225, y: windowHeight * 0.15 }, // Half visible start (450px / 2)
+            p1: { x: windowWidth * 0.5, y: windowHeight * 0.8 }, // Deeper curve to restore gravity feel
+            p2: { x: windowWidth + 50, y: windowHeight * 0.1 } // Lands top-right
         };
 
         const saturnPath = {
-            p0: { x: windowWidth + 50, y: windowHeight * 0.2 },
-            p1: { x: windowWidth * 0.5, y: windowHeight * 0.9 },
-            p2: { x: -200, y: windowHeight * 0.15 }
+            // THE GRAND ARCH: Rises from bottom-right, arcs high over content, sets bottom-left
+            p0: { x: windowWidth + 200, y: windowHeight * 0.8 }, 
+            p1: { x: windowWidth * 0.5, y: -windowHeight * 0.3 }, // Peak high above screen
+            p2: { x: -200, y: windowHeight * 0.36 } 
         };
 
         // Pre-calculate card positions for visibility check (Optimization)
@@ -135,7 +133,7 @@ function updateCinematicPhysics(now) {
     if (windowWidth < 900) {
         currentScrollY = targetScrollY;
     } else {
-        currentScrollY = lerp(currentScrollY, targetScrollY, 0.15); 
+        currentScrollY = lerp(currentScrollY, targetScrollY, 0.1); 
     }
 
     // ========== READING PROGRESS (Efficient Loop Update) ==========
@@ -179,7 +177,7 @@ function updateCinematicPhysics(now) {
                 const card = metric.el;
                 if (!card.isHovered) {
                     // Staggered movement based on index creates incredible 3D depth
-                    const cardParallax = (currentScrollY * 0.02) + (index % 2 * 5);
+                    const cardParallax = (currentScrollY * 0.02);
                     card.style.transform = `translate3d(0, -${cardParallax.toFixed(2)}px, 0)`;
                     card.dataset.currentParallax = -cardParallax; // Store for tilt handoff
                 }
@@ -213,13 +211,15 @@ function updateCinematicPhysics(now) {
         const jupiterX = quadraticBezier(jupiterPath.p0.x, jupiterPath.p1.x, jupiterPath.p2.x, jupiterProgress);
         const jupiterY = quadraticBezier(jupiterPath.p0.y, jupiterPath.p1.y, jupiterPath.p2.y, jupiterProgress);
     
-        const jupiterRotation = (now * 0.005) % 360;
-        // Start bigger (0.8), Mid (1.1), End (0.8)
-        const jupiterScale = 0.8 + 0.4 * Math.sin(jupiterProgress * Math.PI); 
+        const jupiterFade = Math.min(0.4 + jupiterProgress * 2, 1); // More solid start (0.4 base)
+        const jupiterRotation = (now * 0.008) % 360; // Slightly faster rotation
+        // CONTROLLED SIZE: Starts at 0.9, peaks, then shrinks to 0.7 at the end
+        const jupiterScale = 0.9 + 0.5 * Math.sin(jupiterProgress * Math.PI) - (jupiterProgress * 0.35); 
+        jupiterEl.style.opacity = (jupiterFade * 0.5).toFixed(2); // Slightly more solid max opacity
         jupiterEl.style.transform = `translate3d(${jupiterX.toFixed(2)}px, ${jupiterY.toFixed(2)}px, 0) rotate(${jupiterRotation.toFixed(2)}deg) scale(${jupiterScale.toFixed(2)})`;
     
         // ========== SATURN: CURVED PATH ==========
-        const saturnZoneStart = jupiterZoneEnd * 0.85; // Delayed to prevent overlap
+        const saturnZoneStart = jupiterZoneEnd * 0.81; // Delayed to prevent overlap
         const saturnZoneEnd = maxScroll;
         const saturnZoneHeight = Math.max(saturnZoneEnd - saturnZoneStart, 1);
     
@@ -232,11 +232,11 @@ function updateCinematicPhysics(now) {
         const saturnY = quadraticBezier(saturnPath.p0.y, saturnPath.p1.y, saturnPath.p2.y, saturnProgress);
     
         const saturnFade = Math.min(saturnProgress * 4, 1); 
-        const saturnRotation = -(now * 0.005) % 360; // Rotate opposite direction
-        // Start (1.1), Dip mid (0.9), End (1.1) - Increased overall size
-        const saturnScale = 1.2 - 0.2 * Math.sin(saturnProgress * Math.PI); 
+        const saturnRotation = -(now * 0.01) % 360; // Faster rotation for dynamism
+        // FLYBY EFFECT: Starts distant (0.9), grows massive overhead (1.4), fades away
+        const saturnScale = 0.9 + 0.5 * Math.sin(saturnProgress * Math.PI); 
     
-        saturnEl.style.opacity = (saturnFade * 0.4).toFixed(2); // Match Jupiter opacity
+        saturnEl.style.opacity = (saturnFade * 0.5).toFixed(2); // Slightly clearer than before
         saturnEl.style.transform = `translate3d(${saturnX.toFixed(2)}px, ${saturnY.toFixed(2)}px, 0) rotate(${saturnRotation.toFixed(2)}deg) scale(${saturnScale.toFixed(2)})`;
     }
 
@@ -260,7 +260,7 @@ function updateCinematicPhysics(now) {
 function initCardGlow() {
     if (window.matchMedia("(hover: none)").matches) return; // Ignore on touch
 
-    const cards = document.querySelectorAll(".card:not(.card-simple):not(.card-static), .content-card:not(.card-simple):not(.card-static), .solid-glass:not(.card-simple):not(.card-static), .glass-panel");
+    const cards = document.querySelectorAll(CARD_SELECTOR);
     cards.forEach(card => {
         let rect;
         let ticking = false; // Throttling flag for performance
@@ -268,6 +268,7 @@ function initCardGlow() {
         card.addEventListener("mouseenter", () => {
             card.isHovered = true;
             rect = card.getBoundingClientRect();
+            // Enable smooth transition for the hover lift
             card.style.transition = "transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s ease, border-color 0.6s ease, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
             
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
@@ -277,14 +278,9 @@ function initCardGlow() {
         card.addEventListener("mousemove", (e) => {
             if (!ticking) {
                 window.requestAnimationFrame(() => {
-                    // Optimization: Use cached rect from mouseenter to avoid layout thrashing
                     if (!rect) rect = card.getBoundingClientRect();
-                    
-                    // Calculate relative position for Glow & Tilt
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
-                    
-                    // Update CSS variables for the Glow Effect
                     card.style.setProperty("--mouse-x", `${x}px`);
                     card.style.setProperty("--mouse-y", `${y}px`);
 
@@ -296,7 +292,7 @@ function initCardGlow() {
 
         card.addEventListener("mouseleave", () => {
             card.isHovered = false;
-            card.style.transition = "transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), height 0.7s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.6s ease, border-color 0.6s ease, background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1)";
+            // Keep transition for smooth return
             const currentParallax = parseFloat(card.dataset.currentParallax || 0);
             card.style.transform = `translate3d(0, ${currentParallax}px, 0)`;
 
@@ -313,8 +309,13 @@ function initCardGlow() {
 
 // ======== SIDEBAR SCROLL SPY ========
 function updateSidebarActiveState() {
-    const sections = document.querySelectorAll('.reading-text h3[id], .reading-text h2[id]');
-    const links = document.querySelectorAll('.sidebar-list a');
+    if (!physicsCache.sidebarElements) {
+        const sections = document.querySelectorAll('.reading-text h3[id], .reading-text h2[id]');
+        const links = document.querySelectorAll('.sidebar-list a');
+        physicsCache.sidebarElements = { sections, links };
+    }
+    
+    const { sections, links } = physicsCache.sidebarElements;
     
     if (sections.length === 0) return;
 
@@ -451,7 +452,6 @@ function initSubscribeScroll() {
 
 // ========== GLOBAL INITIALIZATION & MOBILE MENU ==========
 document.addEventListener("DOMContentLoaded", () => {
-    lastPhysicsTime = 0;
     updateCinematicPhysics(performance.now());
     initCardGlow(); 
     updateSidebarActiveState();

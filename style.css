@@ -59,12 +59,6 @@ body {
   backface-visibility: hidden; /* Improves scroll/parallax performance */
 }
 
-/* Special parallax for very long pages */
-.space-bg.long-read-bg {
-    height: 200%; /* Much taller buffer */
-    top: -50%;
-}
-
 /* Page Specific Backgrounds */
 .space-bg.bg-poems {
   background-image: radial-gradient(circle at center, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%),
@@ -234,7 +228,7 @@ body {
 }
 
 .spinning-logo { 
-  width: 280px; 
+  width: 250px; 
   opacity: 0.9; 
   /* Combine spinning (transform) and floating (translate) */
   animation: spinForever 25s infinite linear, floatHero 6s ease-in-out infinite; 
@@ -440,7 +434,7 @@ body {
     letter-spacing: 4px;
     color: #ffcc00; 
     text-transform: uppercase;
-    margin-bottom: 2.5rem;
+    margin-bottom: 6rem;
     font-weight: 600;
 }
 
@@ -486,13 +480,11 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: box-shadow 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.6s ease;
+    transition: box-shadow 0.8s ease, background 0.8s ease, border-color 0.8s ease;
     
     /* Hardware acceleration to prevent text blur on hover */
-    backface-visibility: hidden;
-    transform: translateZ(0);
     -webkit-font-smoothing: antialiased;
-    will-change: transform; /* Removed box-shadow to save memory */
+    will-change: transform;
 }
 
 .glass-panel:hover {
@@ -822,6 +814,7 @@ footer {
       will-change: auto !important; /* Save memory on mobile */
       transform: none !important; /* Disable parallax transform completely */
       position: fixed !important; /* Keep fixed but no transform */
+      height: 100dvh !important; /* Prevent URL bar jump */
   }
 
   /* PERFORMANCE PATCH: Disable heavy effects on mobile */
@@ -1323,21 +1316,15 @@ footer {
     border-radius: 12px;
     /* Subtle Noise Texture */
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.07'/%3E%3C/svg%3E") !important;
-    padding: 1rem 1.5rem;
-    /* UPDATED: Removed fixed height to prevent overlap */
-    transition: 
-                box-shadow 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
-                background 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
-                transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
-                border-color 0.6s ease;
+    padding: 1rem 1.5rem; /* UPDATED: Removed fixed height to prevent overlap */
+    transition: box-shadow 0.8s ease,
+                background 0.8s ease,
+                border-color 0.8s ease;
     text-decoration: none !important;
     color: #fff !important;
     display: flex;
     flex-direction: column;
-    backface-visibility: hidden;
-    transform: translateZ(0);
     -webkit-font-smoothing: antialiased;
-    will-change: transform;
 }
 
 a.solid-glass:hover {
@@ -1619,7 +1606,7 @@ a.solid-glass:hover {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .card-anchor:hover .item-excerpt {
     max-height: 150px;
@@ -1777,26 +1764,25 @@ a.solid-glass:hover {
 }
 
 .sealed-icon {
-    font-size: 2.5rem;
-    color: rgba(255, 255, 255, 0.3);
-    margin-bottom: 0.5rem;
+    font-size: 3rem;
+    color: #64B5F6;
+    margin-bottom: 1.5rem;
 }
 
 .sealed-title {
     font-size: 2rem; 
-    margin-bottom: 0.5rem; 
+    margin-bottom: 1rem; 
     color: #fff;
-    font-weight: 300;
+    font-family: var(--font-main);
     letter-spacing: 0.05em;
 }
 
 .sealed-text {
     font-size: 1.1rem; 
     line-height: 1.6; 
-    color: #e0e0e0; 
-    max-width: 600px; 
+    color: rgba(255,255,255,0.8);
+    max-width: 500px; 
     margin: 0 auto;
-    text-align: justify;
 }
 
 /* --- SIDEBAR STATES --- */
@@ -2146,6 +2132,29 @@ a.solid-glass:hover {
     max-width: 200px;
 }
 
+#subscribe-engine .subscribe-card {
+    /* Apply hover styles statically */
+    border-color: #FFD700;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.3);
+    transform: none !important; /* Prevent lift from JS and parallax */
+    cursor: default;
+    background: rgba(10, 15, 20, 0.65);
+}
+
+/* Override the hover state to do nothing */
+#subscribe-engine .subscribe-card:hover {
+    border-color: #FFD700; /* Keep same */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.3); /* Keep same */
+    transform: none !important; /* Keep same */
+    background: rgba(10, 15, 20, 0.65); /* Match the general hover background */
+}
+
+/* Disable the mouse-follow glow */
+#subscribe-engine .subscribe-card::after {
+    display: none !important;
+}
+
+
 #silent-subscribe-form button:hover {
     background: #fff;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
@@ -2218,38 +2227,6 @@ a.solid-glass:hover {
         box-shadow: 0 0 20px rgba(255, 215, 0, 0.1) !important;
         min-width: 100% !important;
     }
-}
-
-/* Disable hover effects on subpage index cards */
-.content-featured .card-anchor:hover,
-.content-archive .card-simple:hover {
-    transform: none !important;
-    box-shadow: none !important;
-}
-
-.content-featured .card-anchor:hover {
-    background: rgba(10, 15, 20, 0.6) !important;
-    border-color: rgba(255, 255, 255, 0.05); /* Reset from theme color */
-}
-
-/* Re-apply the theme-specific left border that gets overridden by border-color */
-.content-featured .card-anchor.earth-theme:hover { border-left-color: var(--color-earth); }
-.content-featured .card-anchor.fire-theme:hover { border-left-color: var(--color-fire); }
-.content-featured .card-anchor.water-theme:hover { border-left-color: var(--color-water); }
-
-.content-archive .card-simple:hover {
-    background: rgba(10, 15, 20, 0.5) !important; /* Reset to its base color */
-}
-
-.content-featured .card-anchor:hover .item-excerpt {
-    max-height: 0 !important;
-    opacity: 0 !important;
-    margin-top: 0 !important;
-}
-
-.content-featured .card-anchor:hover::after,
-.content-archive .card-simple:hover::after {
-    opacity: 0 !important;
 }
 
 /* --- MOBILE TOC (Divine Love Page) --- */
