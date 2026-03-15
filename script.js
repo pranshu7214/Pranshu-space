@@ -455,12 +455,12 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCinematicPhysics(performance.now());
     initCardGlow(); 
     updateSidebarActiveState();
-    setupArchiveComingSoon(); // Initialize Archive Toggle
     initReadingFeatures(); // Initialize Reading Time & Share
     initBackToTop(); // Initialize Back to Top button
     initMuseumDisplay(); // Initialize Museum Display
     initSubscribeForm(); // Initialize Homepage Subscribe
     initSubscribeScroll(); // Initialize Subscribe Scroll & Focus
+    setupArchiveComingSoon(); // Initialize Selective Archive Toggle
 
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
@@ -494,7 +494,8 @@ document.addEventListener('contextmenu', function(e) {
 
 // ======== ARCHIVE COMING SOON TOGGLE ========
 function setupArchiveComingSoon() {
-    const archiveSection = document.querySelector('.content-archive');
+    // Only target archives that explicitly need to be hidden
+    const archiveSection = document.querySelector('.content-archive.requires-toggle');
     if (!archiveSection) return;
 
     // 1. Enable Coming Soon Mode (Hides cards via CSS class)
