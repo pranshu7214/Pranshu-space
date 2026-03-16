@@ -133,7 +133,8 @@ function updateCinematicPhysics(now) {
     if (windowWidth < 900) {
         currentScrollY = targetScrollY;
     } else {
-        currentScrollY = lerp(currentScrollY, targetScrollY, 0.1); 
+        // Increased lerp from 0.1 to 0.45 to remove touchpad input delay
+        currentScrollY = lerp(currentScrollY, targetScrollY, 0.45); 
     }
 
     // ========== READING PROGRESS (Efficient Loop Update) ==========
