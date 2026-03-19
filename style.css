@@ -775,6 +775,12 @@ footer {
     background: rgba(255, 255, 255, 0.1);
     box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
 }
+.footer-socials a[href*="linkedin"]:hover {
+    color: #0077b5;
+    border-color: #0077b5;
+    background: rgba(0, 119, 181, 0.1);
+    box-shadow: 0 0 15px rgba(0, 119, 181, 0.4);
+}
 .footer-socials a[href^="mailto"]:hover {
     color: #EA4335; /* Gmail Red */
     border-color: #EA4335;
@@ -795,6 +801,17 @@ footer {
     color: #666;
     margin-bottom: 0.5rem;
     letter-spacing: 0.05em;
+}
+.legal-link {
+    color: rgba(255, 255, 255, 0.2);
+}
+.legal-link a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.legal-link a:hover {
+    color: #FFD700;
 }
 .footer-bottom .footer-quote {
     font-style: italic;
@@ -1510,6 +1527,12 @@ a.solid-glass:hover {
     line-height: 0.8;
     margin-right: 0.5rem;
     color: #FFD700;
+}
+
+/* Fix the gap between 'A' and 'll' on the centered Legal page */
+.reading-text.legal-text p:first-of-type::first-letter {
+    float: none;
+    margin-right: 0.05rem;
 }
 
 /* Disable selection for copy protection */
@@ -2269,6 +2292,30 @@ a.solid-glass:hover {
 /* =========================================
    ABOUT PAGE CARD
    ========================================= */
+.contact-email-link {
+    color: #e0e0e0;
+    text-decoration: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+.contact-email-link:hover {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+}
+
+/* Sleek Contact Badge for About Page */
+.contact-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2.5rem 2rem !important;
+    max-width: 600px;
+    width: 100%;
+    border-radius: 16px !important;
+    text-align: center;
+}
+
 .about-card {
     padding: 4rem 5rem !important;
     max-width: 1100px;
