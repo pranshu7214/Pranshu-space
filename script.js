@@ -463,6 +463,14 @@ document.addEventListener("DOMContentLoaded", () => {
     initSubscribeScroll(); // Initialize Subscribe Scroll & Focus
     setupArchiveComingSoon(); // Initialize Selective Archive Toggle
 
+    // Global intercept for '#' links to prevent jumping to top
+    document.addEventListener('click', (e) => {
+        const anchor = e.target.closest('a');
+        if (anchor && anchor.getAttribute('href') === '#') {
+            e.preventDefault();
+        }
+    });
+
     const toggle = document.querySelector(".menu-toggle");
     const mobileMenu = document.getElementById("mobileMenu");
 
@@ -655,6 +663,7 @@ function initSubscribeForm() {
                 // 3. Wait for fade out, then swap
                 setTimeout(() => {
                     form.style.display = 'none';
+                    form.reset(); // Clear the email input field for UX
                     
                     const successMessage = form.nextElementSibling;
                     if (successMessage) {
