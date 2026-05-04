@@ -2519,6 +2519,7 @@ a.solid-glass:hover {
     font-style: italic;
     color: #fff;
 }
+.inline-quote.water { border-left-color: var(--color-water); }
 
 .section-divider {
     border: 0;
