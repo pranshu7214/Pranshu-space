@@ -193,8 +193,13 @@ body {
     text-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
 }
 
-/* Mobile Toggle - Hidden on Desktop */
-.menu-toggle, .mobile-home-icon { display: none; }
+/* Mobile Elements - Hidden on Desktop */
+.menu-toggle, .mobile-home-icon, .mobile-nav-overlay { display: none; }
+
+/* Force hide mobile menu on desktop even if JS sets inline styles */
+@media (min-width: 901px) {
+    .mobile-nav-overlay { display: none !important; }
+}
 
 .mobile-home-icon.active {
   color: #FFD700;
