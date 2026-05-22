@@ -460,9 +460,10 @@ body {
     gap: 2rem;
 }
 
-/* 2 Columns for Verse */
+/* 3 Columns for Verse (Matching Prose Layout) */
 .verse-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 0.85fr 1fr;
+    align-items: center;
 }
 
 /* 1 Column for Tales */
@@ -837,6 +838,7 @@ footer {
       transform: none !important; /* Disable parallax transform completely */
       position: fixed !important; /* Keep fixed but no transform */
       height: 100dvh !important; /* Prevent URL bar jump */
+      top: 0 !important; /* Reset the offset used for desktop parallax */
   }
 
   /* PERFORMANCE PATCH: Disable heavy effects on mobile */
