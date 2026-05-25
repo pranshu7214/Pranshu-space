@@ -56,6 +56,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://pranshu.space/poems/safe-and-alone.html</loc>
+    <lastmod>2026-05-25</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://pranshu.space/poems/creatures-of-deep.html</loc>
     <lastmod>2026-05-22</lastmod>
     <priority>0.8</priority>
@@ -63,6 +68,11 @@
   <url>
     <loc>https://pranshu.space/fiction/the-rehearsed-lie.html</loc>
     <lastmod>2026-03-12</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pranshu.space/legal/</loc>
+    <lastmod>2026-05-25</lastmod>
     <priority>0.8</priority>
   </url>
 </urlset>
